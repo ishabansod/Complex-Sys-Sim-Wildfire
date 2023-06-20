@@ -39,6 +39,9 @@ class WildFireSimulation:
                     neighbors = [
                         [state[i][j] for j in range(col - 1, col + 2)] for i in range(row - 1, row + 2)
                         ]
+                    # neighbors = [
+                    #     [state[i][j] for j in range(col - 1, col + 2) if (i, j) != (row, col)] for i in range(row - 1, row + 2)
+                    #     ]
                     # print("-----------------",neighbors)
                     self.current_forest[row][col] = self.grid.burn_trees(row, col, neighbors)
         self.history.append(np.copy(self.current_forest))
@@ -57,7 +60,7 @@ class WildFireSimulation:
             animations.append([ani])
             
         gif = animation.ArtistAnimation(fig, animations, interval=100, blit=True,repeat_delay=100)
-        gif.save('gif.gif')
+        gif.save('gif-density-tree.gif')
         plt.show()
 
     

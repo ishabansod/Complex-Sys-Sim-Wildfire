@@ -33,21 +33,23 @@ class Grid:
     
     def init_density(self, density):
         # three types - 1: sparse, 2: normal and 3: dense
-        den_matrix = [[0 for _ in range(self.cols)] for _ in range(self.rows)]
-        
-        if not density:  # tree density on the grid
+        density_matrix = [[0 for _ in range(self.cols)] for _ in range(self.rows)]
+    
+        if not density:  # uniform tree density of the grid
             for i in range(self.rows):
                 for j in range(self.cols):
-                    den_matrix[i][j] = 1
+                    density_matrix[i][j] = 1
         else:
             for i in range(self.rows):
                 for j in range(self.cols):
-                    if i < self.rows // 2:
-                        den_matrix[i][j] = 1
+                    if i < self.rows // 3:
+                        density_matrix[i][j] = 1 # sparse
+                    elif i <= (2 * self.rows) //3:
+                        density_matrix[i][j] = 2 # normal
                     else:
-                        den_matrix[i][j] = 2
+                        density_matrix[i][j] = 3 # dense
         
-        return den_matrix
+        return density_matrix
     
     def init_altitude(self, altitude):
         # TODO see how to incorporate this in burning probability
@@ -94,9 +96,11 @@ class Grid:
         return forest
     
     def burn_trees(self, x, y, neighbors):
-        # TODO add density and height, possibly wind too
+        # TODO add height, possibly wind too
         # probability of burning
         p = 0.5
+
+        # probability of burning due to tree type       
         p_tree_type = {
             1: -0.3,
             2: 0,
@@ -104,8 +108,16 @@ class Grid:
         } # values from the ref paper
         p_tree = p_tree_type[self.trees[x][y]]
 
+        # probability of burning due to density
+        p_density_type = {
+            1: -0.4,
+            2: 0,
+            3: 0.3
+        } # values from the ref paper
+        p_density = p_density_type[self.density[x][y]]
+
         if any(neighbors[row][col] == 3 for row in range(3) for col in range(3)):
-            burn_prob = p*(1+p_tree)  # add other factors here ?
+            burn_prob = p * (1 + p_tree) * (1 + p_density)  # add other factors here 
             if burn_prob > random.random():
                 return 3
         return 2
