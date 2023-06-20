@@ -57,6 +57,39 @@ class WildFireSimulation:
         gif.save('gif.gif')
         plt.show()
 
+    
+    def plot_distribution(self, history):
+        plot_empty = []
+        plot_trees = []
+        plot_burning = []
+        plot_burned = []
+
+        for state in history:
+            num_empty = np.count_nonzero(state == 1) #TODO empty may be removed
+            num_trees = np.count_nonzero(state == 2) 
+            num_burning = np.count_nonzero(state == 3)
+            num_burned = np.count_nonzero(state == 4)
+
+            plot_empty.append(num_empty)
+            plot_trees.append(num_trees)
+            plot_burning.append(num_burning)
+            plot_burned.append(num_burned)
+
+        time_steps = range(len(plot_empty))
+
+        plt.figure()
+        plt.plot(time_steps, plot_empty, label='Empty')
+        plt.plot(time_steps, plot_trees, label='Trees')
+        plt.plot(time_steps, plot_burning, label='Burning')
+        plt.plot(time_steps, plot_burned, label='Burned')
+        plt.xlabel('Time Step')
+        plt.ylabel('Number of Cells')
+        plt.title('Distribution of Cells over Time')
+        plt.legend()
+        plt.savefig('plot_empty.png')
+
+
+
 if __name__=="__main__":
     # Example:
     rows = 50
@@ -65,4 +98,5 @@ if __name__=="__main__":
     
     simulation = WildFireSimulation(rows, cols)
     simulation.animate(steps)
+    simulation.plot_distribution(simulation.history)
     
