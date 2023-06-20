@@ -10,6 +10,9 @@ class WildFireSimulation:
     def __init__(self, rows, cols):
         self.grid = Grid(rows, cols)
         self.current_forest = self.grid.init_grid()
+
+        self.grid.visualize_trees() # to show how different trees are placed on the grid
+        
         self.history = [] # stores a list of forest states
         self.history.append(np.copy(self.current_forest))
 
@@ -37,7 +40,7 @@ class WildFireSimulation:
                         [state[i][j] for j in range(col - 1, col + 2)] for i in range(row - 1, row + 2)
                         ]
                     # print("-----------------",neighbors)
-                    self.current_forest[row][col] = self.grid.burn_trees(neighbors)
+                    self.current_forest[row][col] = self.grid.burn_trees(row, col, neighbors)
         self.history.append(np.copy(self.current_forest))
         return self.current_forest
     
@@ -92,9 +95,9 @@ class WildFireSimulation:
 
 if __name__=="__main__":
     # Example:
-    rows = 50
-    cols = 50
-    steps = 100
+    rows = 100
+    cols = 100
+    steps = 150
     
     simulation = WildFireSimulation(rows, cols)
     simulation.animate(steps)
