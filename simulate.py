@@ -15,6 +15,7 @@ class WildFireSimulation:
         
         self.history = [] # stores a list of forest states
         self.history.append(np.copy(self.current_forest))
+        self.converged = False
 
     def update_grid(self):
         # take current grid as input
@@ -44,7 +45,10 @@ class WildFireSimulation:
                     #     ]
                     # print("-----------------",neighbors)
                     self.current_forest[row][col] = self.grid.burn_trees(row, col, neighbors)
-        self.history.append(np.copy(self.current_forest))
+        if not np.array_equal(state, self.current_forest):
+            self.history.append(np.copy(self.current_forest))
+        else:
+            self.converged = True
         return self.current_forest
     
     def animate(self, steps):
@@ -94,7 +98,15 @@ class WildFireSimulation:
         plt.legend()
         plt.savefig('plot_empty.png')
 
-
+    def run(self,steps):
+        for _ in range(steps):
+            self.update_grid()
+            if self.converged:
+                break
+    
+    def reset(self,steps):
+        self.converged = False
+        self.history = []
 
 if __name__=="__main__":
     # Example:
@@ -103,6 +115,5 @@ if __name__=="__main__":
     steps = 150
     
     simulation = WildFireSimulation(rows, cols)
-    simulation.animate(steps)
-    simulation.plot_distribution(simulation.history)
-    
+    simulation.run(steps)
+    print(len(simulation.history))    
