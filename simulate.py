@@ -11,7 +11,9 @@ class WildFireSimulation:
         self.grid = Grid(rows, cols)
         self.current_forest = self.grid.init_grid()
 
+        #plotting functions
         self.grid.visualize_trees() # to show how different trees are placed on the grid
+        self.grid.visualize_altitude()
         
         self.history = [] # stores a list of forest states
         self.history.append(np.copy(self.current_forest))
@@ -116,4 +118,5 @@ if __name__=="__main__":
     
     simulation = WildFireSimulation(rows, cols)
     simulation.run(steps)
+    # simulation.animate(steps)
     print(len(simulation.history))    

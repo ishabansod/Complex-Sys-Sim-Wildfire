@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import cm
 import random
+import math
 
 class Grid:
     def __init__(self, rows, cols):
@@ -52,9 +53,14 @@ class Grid:
         return density_matrix
     
     def init_altitude(self, altitude):
-        # TODO see how to incorporate this in burning probability
         alt_matrix = [[0 for _ in range(self.cols)] for _ in range(self.rows)]
-        
+
+        max_height = 10
+        offset_x = 20
+        offset_y = 20
+
+        noise_factor = 0.3  # Adjust this to control the level of noise
+
         if not altitude:  # uniform grid height
             for i in range(self.rows):
                 for j in range(self.cols):
@@ -62,14 +68,44 @@ class Grid:
         else:  # mountain-like altitude distribution
             for i in range(self.rows):
                 for j in range(self.cols):
-                    alt_matrix[i][j] = abs(j - self.cols // 2) + abs(i - self.rows // 2)
-        
+                    # Calculate the distance of the cell from the offset center of the grid
+                    distance = math.sqrt((i - self.rows/2 + offset_y)**2 + (j - self.cols/2 + offset_x)**2)
+
+                    # Calculate the height of the mountain at that cell
+                    height = max_height * math.exp(-0.1 * distance)
+
+                    # Add random noise to the height
+                    noise = random.uniform(-1, 1) * noise_factor
+                    height += noise
+
+                    # Assign the height to the cell in the grid
+                    alt_matrix[i][j] = height
+            
         return alt_matrix
+
+    def is_diagonal(self, neighbor_row, neighbor_col, x, y):
+        row_offset = abs(x - neighbor_row)
+        col_offset = abs(y - neighbor_col)
+        return row_offset != 0 and col_offset != 0
+
+
+    def calc_slope(self, neighbor, cell, is_diagonal):
+        #TODO decide constants
+        #Calculate the slope based on paper
+        length = 1 # length of square side (constant)
+        if is_diagonal:
+            Theta = math.atan((neighbor - cell) / length)
+        else:
+            Theta = math.atan((neighbor - cell) / (length * math.sqrt(2)))
+        a = 1 #constant value
+        return np.exp(a * Theta)
     
     def colormap(self, title, array):
         np_array = np.array(array)
         plt.imshow(np_array, interpolation="none", cmap=cm.viridis) # cmap=cm.Reds
+        plt.colorbar()
         plt.title(title)
+        plt.savefig(title)
         plt.show()
     
     def visualize_trees(self):
@@ -116,10 +152,15 @@ class Grid:
         } # values from the ref paper
         p_density = p_density_type[self.density[x][y]]
 
-        if any(neighbors[row][col] == 3 for row in range(3) for col in range(3)):
-            burn_prob = p * (1 + p_tree) * (1 + p_density)  # add other factors here 
-            if burn_prob > random.random():
-                return 3
+        #currently probability is calculated for each neighbor (TODO: can be changed)
+        for row in range(3):
+            for col in range(3):
+                if neighbors[row][col] == 3:
+                    diag = self.is_diagonal(row, col, x, y)
+                    slope = self.calc_slope(self.altitude[row][col], self.altitude[x][y], diag)
+                    burn_prob = p * (1 + p_tree) * (1 + p_density) * slope  # add other factors here 
+                    if burn_prob > random.random():
+                        return 3
         return 2
 
 # example
