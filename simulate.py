@@ -10,8 +10,12 @@ class WildFireSimulation:
     def __init__(self, rows, cols):
         self.grid = Grid(rows, cols)
         self.current_forest = self.grid.init_grid()
+
+        self.grid.visualize_trees() # to show how different trees are placed on the grid
+        
         self.history = [] # stores a list of forest states
         self.history.append(np.copy(self.current_forest))
+        self.converged = False
 
     def update_grid(self):
         # take current grid as input
@@ -36,9 +40,15 @@ class WildFireSimulation:
                     neighbors = [
                         [state[i][j] for j in range(col - 1, col + 2)] for i in range(row - 1, row + 2)
                         ]
+                    # neighbors = [
+                    #     [state[i][j] for j in range(col - 1, col + 2) if (i, j) != (row, col)] for i in range(row - 1, row + 2)
+                    #     ]
                     # print("-----------------",neighbors)
-                    self.current_forest[row][col] = self.grid.burn_trees(neighbors)
-        self.history.append(np.copy(self.current_forest))
+                    self.current_forest[row][col] = self.grid.burn_trees(row, col, neighbors)
+        if not np.array_equal(state, self.current_forest):
+            self.history.append(np.copy(self.current_forest))
+        else:
+            self.converged = True
         return self.current_forest
     
     def animate(self, steps):
@@ -54,7 +64,7 @@ class WildFireSimulation:
             animations.append([ani])
             
         gif = animation.ArtistAnimation(fig, animations, interval=100, blit=True,repeat_delay=100)
-        gif.save('gif.gif')
+        gif.save('gif-density-tree.gif')
         plt.show()
 
     
@@ -88,15 +98,22 @@ class WildFireSimulation:
         plt.legend()
         plt.savefig('plot_empty.png')
 
-
+    def run(self,steps):
+        for _ in range(steps):
+            self.update_grid()
+            if self.converged:
+                break
+    
+    def reset(self,steps):
+        self.converged = False
+        self.history = []
 
 if __name__=="__main__":
     # Example:
-    rows = 50
-    cols = 50
-    steps = 100
+    rows = 100
+    cols = 100
+    steps = 150
     
     simulation = WildFireSimulation(rows, cols)
-    simulation.animate(steps)
-    simulation.plot_distribution(simulation.history)
-    
+    simulation.run(steps)
+    print(len(simulation.history))    
