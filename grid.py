@@ -8,29 +8,37 @@ class Grid:
     def __init__(self, rows, cols):
         self.rows = rows
         self.cols = cols
-        self.trees = self.init_trees(trees=True)
+        self.trees = self.init_trees(percentage_trees= (50,50),trees=True)
         self.density = self.init_density(density=True)
         self.altitude = self.init_altitude(altitude=True)
     
-    def init_trees(self, trees=False):
-        # three types - 1: agricultural areas, 2: shrubs and 3: pine trees
+    def init_trees(self, percentage_trees=(30, 70), trees=True):
+        # two types - 1: agricultural areas and 2: pine trees
         tree_matrix = [[0 for _ in range(self.cols)] for _ in range(self.rows)]
-        
+
         if not trees:  # only one type of tree
             for i in range(self.rows):
                 for j in range(self.cols):
                     tree_matrix[i][j] = 1
+
         else:
-            for i in range(self.rows):
-                for j in range(self.cols):
-                    if i < self.cols // 3:
-                        tree_matrix[i][j] = 1 # agricultural areas
-                    elif i <= (2 * self.cols) //3:
-                        tree_matrix[i][j] = 2 # shrubs
-                    else:
-                        tree_matrix[i][j] = 3 # pine trees
-        
-        return tree_matrix 
+            total_percentage = sum(percentage_trees)
+            if total_percentage != 100:
+                raise ValueError("The sum of percentages should be 100.")
+
+            curr_row = 0
+            for i, percentage in enumerate(percentage_trees):
+                num_rows = (percentage * self.cols) // 100
+
+                for row in range(curr_row, curr_row + num_rows):
+                    for j in range(self.rows):
+                        if i == 0:
+                            tree_matrix[j][row] = 1  # agricultural areas
+                        elif i == 1:
+                            tree_matrix[j][row] = 2  # pine trees
+                curr_row += num_rows
+
+        return tree_matrix
     
     def init_density(self, density):
         # three types - 1: sparse, 2: normal and 3: dense
@@ -140,8 +148,7 @@ class Grid:
         # probability of burning due to tree type       
         p_tree_type = {
             1: -0.3,
-            2: 0,
-            3: 0.4
+            2: 0.3
         } # values from the ref paper
         p_tree = p_tree_type[self.trees[x][y]]
 

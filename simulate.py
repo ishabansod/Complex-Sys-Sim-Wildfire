@@ -66,7 +66,7 @@ class WildFireSimulation:
             animations.append([ani])
             
         gif = animation.ArtistAnimation(fig, animations, interval=100, blit=True,repeat_delay=100)
-        gif.save('plots/gif-density-tree.gif')
+        gif.save('plots/gif-tree-type.gif')
         plt.show()
 
     
@@ -136,11 +136,13 @@ if __name__=="__main__":
     # Example:
     rows = 100
     cols = 100
-    steps = 150
+    steps = 200
     
     simulation = WildFireSimulation(rows, cols)
-    simulation.run(steps)
-    simulation.run_simulations()
-    # simulation.animate(steps)
+    simulation.run(steps) # without animation
+    # simulation.animate(steps) # with animation
     # simulation.plot_distribution(simulation.history)
-    print(len(simulation.history))    
+    print(len(simulation.history))
+
+
+
