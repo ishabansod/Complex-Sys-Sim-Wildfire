@@ -66,7 +66,7 @@ class WildFireSimulation:
             animations.append([ani])
             
         gif = animation.ArtistAnimation(fig, animations, interval=100, blit=True,repeat_delay=100)
-        gif.save('gif-density-tree.gif')
+        gif.save('plots/gif-density-tree.gif')
         plt.show()
 
     
@@ -98,7 +98,7 @@ class WildFireSimulation:
         plt.ylabel('Number of Cells')
         plt.title('Distribution of Cells over Time')
         plt.legend()
-        plt.savefig('plot_empty.png')
+        plt.savefig('plots/plot_empty.png')
 
     def run(self,steps):
         for _ in range(steps):
@@ -110,6 +110,28 @@ class WildFireSimulation:
         self.converged = False
         self.history = []
 
+    def run_simulations(self, n_simulations=100):
+        burned_plot = []
+
+        for _ in range(n_simulations):
+            simulation = WildFireSimulation(rows, cols)
+            simulation.run(steps)
+            
+            #count burned trees
+            print(simulation.history[-1])
+            burned_trees = np.count_nonzero(simulation.history[-1] == 4)
+            burned_plot.append(burned_trees)
+
+        plt.figure()
+        plt.hist(burned_plot, bins='auto', edgecolor='black')
+
+        plt.xlabel('Value')
+        plt.ylabel('Frequency')
+        plt.title('Histogram of burned_plot')
+
+        plt.savefig('plots/simulation.png')
+        # plt.show()
+        
 if __name__=="__main__":
     # Example:
     rows = 100
@@ -118,5 +140,7 @@ if __name__=="__main__":
     
     simulation = WildFireSimulation(rows, cols)
     simulation.run(steps)
+    simulation.run_simulations()
     # simulation.animate(steps)
+    # simulation.plot_distribution(simulation.history)
     print(len(simulation.history))    

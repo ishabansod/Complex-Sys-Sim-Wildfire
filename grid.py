@@ -102,10 +102,11 @@ class Grid:
     
     def colormap(self, title, array):
         np_array = np.array(array)
+        plt.figure()
         plt.imshow(np_array, interpolation="none", cmap=cm.viridis) # cmap=cm.Reds
         plt.colorbar()
         plt.title(title)
-        plt.savefig(title)
+        plt.savefig(os.path.join('plots', title))
         plt.show()
     
     def visualize_trees(self):
