@@ -10,7 +10,7 @@ class Grid:
         self.burned_trees = 0
         
         # auxiliary information grids
-        self.trees = self.init_trees(percentage_trees= (50,50),trees=True)
+        self.trees = self.init_trees(percentage_trees= (50,50), trees=True, rand=False)
         self.density = self.init_density(density=True)
         self.altitude = self.init_altitude(altitude=True)
         self.wind = self.init_wind(wind=True)
@@ -70,7 +70,7 @@ class Grid:
         
     ## AUXILIARY INFORMATION GRIDS ##
     
-    def init_trees(self, percentage_trees=(30, 70), trees=True):
+    def init_trees(self, percentage_trees=(30, 70), trees=True, rand = False):
         # two types - 1: agricultural areas and 2: pine trees
         tree_matrix = [[0 for _ in range(self.cols)] for _ in range(self.rows)]
 
@@ -83,18 +83,44 @@ class Grid:
             total_percentage = sum(percentage_trees)
             if total_percentage != 100:
                 raise ValueError("The sum of percentages should be 100.")
+            
+            # randomly placed two types of trees
+            if rand:
+                shape = (self.rows, self.cols)
+                length = self.rows * self.cols
 
-            curr_row = 0
-            for i, percentage in enumerate(percentage_trees):
-                num_rows = (percentage * self.cols) // 100
+                rest = [2]
+                prob_type1 = percentage_trees[0]
+                prob_base = (100 - prob_type1) // len(rest)
 
-                for row in range(curr_row, curr_row + num_rows):
-                    for j in range(self.rows):
-                        if i == 0:
-                            tree_matrix[j][row] = 1  # agricultural areas
-                        elif i == 1:
-                            tree_matrix[j][row] = 2  # pine trees
-                curr_row += num_rows
+                num_type1 = round(length * (prob_type1 / 100))
+                num_type2 = round(length * (prob_base / 100))
+
+                # Make base 1D array
+                base_arr = [1 for _ in range(num_type1)]
+                for i in rest:
+                    base_arr += [i for _ in range(num_type2)]
+                base_arr = np.array(base_arr)
+
+                # Give it a random order
+                np.random.shuffle(base_arr)
+
+                # Finally, reshape the array
+                tree_matrix = base_arr.reshape(shape)
+            
+            # grid split straight accross
+            else:
+                curr_row = 0
+                for i, percentage in enumerate(percentage_trees):
+                    num_rows = (percentage * self.cols) // 100
+
+                    for row in range(curr_row, curr_row + num_rows):
+                        for j in range(self.rows):
+                            if i == 0:
+                                tree_matrix[j][row] = 1  # agricultural areas
+                            elif i == 1:
+                                tree_matrix[j][row] = 2  # pine trees
+                    curr_row += num_rows
 
         return tree_matrix
     
@@ -102,7 +128,7 @@ class Grid:
         # simplified burn probability depending on wind
         # Set initial conditions
         wind_speed = 10 #input('Give the speed of the wind in m/s:')
-        wind_direction = np.pi #input('Give the direction of the wind as angle between 0 and 2pi:')
+        wind_direction = 2* np.pi #input('Give the direction of the wind as angle between 0 and 2pi:')
         V = wind_speed
         theta = wind_direction # angle between fire propagation and wind direction
         c_1 = .045

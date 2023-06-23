@@ -1,10 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Jun 23 13:14:12 2023
-
-@author: gaston.barboza@goflink.com
-"""
 import copy
 import matplotlib.pyplot as plt
 from matplotlib import cm
@@ -30,7 +23,7 @@ class Visualize():
         self.colormap("Density Map", sim.density)
         self.colormap("Altitude Map", sim.altitude)
         
-    def animate(self,sim, steps):
+    def animate(self, sim, steps):
         animations = []
         fig = plt.figure()
         for _ in range(steps):
