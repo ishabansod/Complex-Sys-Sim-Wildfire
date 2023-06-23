@@ -1,9 +1,6 @@
-import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib import cm
 import random
 import math
-import os
 
 class Grid:
     def __init__(self, rows, cols):
