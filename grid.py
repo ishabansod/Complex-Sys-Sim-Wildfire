@@ -7,6 +7,7 @@ class Grid:
         
         self.rows = rows
         self.cols = cols
+        self.burned_trees = 0
         
         # auxiliary information grids
         self.trees = self.init_trees(percentage_trees= (50,50),trees=True)

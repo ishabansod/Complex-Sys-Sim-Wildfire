@@ -27,6 +27,7 @@ class WildFireSimulation(Grid):
                         self.current_forest[row][col] = 3
                     else:
                         self.current_forest[row][col] = 4
+                        self.burned_trees += 1
 
                 # get neighbors of tree patch, see if it burns or not
                 if state[row][col] == 2:
@@ -44,12 +45,15 @@ class WildFireSimulation(Grid):
             self.converged = True
         return self.current_forest
 
-    def run(self,steps):
-        for _ in range(steps):
+    def run(self,steps=-1):
+        
+        step = 0
+        
+        while steps==-1 or step < steps:
             self.update_grid()
             if self.converged:
                 break
+            step += 1
     
-    def reset(self,steps):
-        self.converged = False
-        self.history = []
+    def reset(self):
+        self.__init__(self.rows,self.cols)
