@@ -24,7 +24,8 @@ class Grid:
         # states: 1- empty; 2- tree; 3- burning; 4- burnt
         # forest = [[2 for _ in range(self.cols)] for _ in range(self.rows)]
         grid_density = 0.3
-        forest = [[1 if random.random() < grid_density else 2 for _ in range(self.cols)] for _ in range(self.rows)]
+        edge = lambda row,col : row == 0 or col == 0 or row == self.rows-1 or col == self.cols-1
+        forest = [[1 if random.random() < grid_density or edge(row,col) else 2 for col in range(self.cols)] for row in range(self.rows)]
         start_fire_x = random.randint(0, self.cols - 1)
         start_fire_y = random.randint(0, self.rows - 1)
 

@@ -18,38 +18,40 @@ class WildFireSimulation(Grid):
         # if the cell is in state 2 (tree) or state 3 (burning)
         # then the cell will be updated according to the rules
 
-        state = self.history[-1]
-        self.lit_tree = False
-        for row in range(1, self.rows - 1):
-            for col in range(1, self.cols - 1):
-                
-                # burning cell becomes burnt
-                if state[row][col] == 3:
-                    if random.random() < 0.5:
-                        self.lit_tree = True
-                        self.current_forest[row][col] = 3
-                    else:
-                        self.current_forest[row][col] = 4
-                        self.burned_trees += 1
-
-                # get neighbors of tree patch, see if it burns or not
-                if state[row][col] == 2:
-                    neighbors = [
-                        [state[i][j] for j in range(col - 1, col + 2)] for i in range(row - 1, row + 2)
-                        ]
-                    # neighbors = [
-                    #     [state[i][j] for j in range(col - 1, col + 2) if (i, j) != (row, col)] for i in range(row - 1, row + 2)
-                    #     ]
-                    # print("-----------------",neighbors)
-                    tree_state = self.burn_trees(row, col, neighbors)
-                    if tree_state == 3:
-                        self.lit_tree = True
-                    self.current_forest[row][col] = tree_state
+        self.lit_tree = False        
+        self.current_forest = [[self.tree_state(row,col) for col in range(self.cols)] for row in range(self.rows)]
         self.history.append(np.copy(self.current_forest))
         if self.lit_tree == False:
             self.converged = True
+        
         return self.current_forest
-
+    
+    def tree_state(self,row,col):
+        
+        # edges do not change
+        if row == 0 or col == 0 or row == self.rows-1 or col == self.cols-1:
+            return 1
+        
+        state = self.history[-1]
+        tree_state = state[row][col]
+        
+        if tree_state == 3:
+            if random.random() < 0.5:
+                self.lit_tree = True
+                return 3
+            else:
+                self.burned_trees += 1
+                return 4
+        
+        if tree_state == 2:
+            neighbors = state[row-1:row+2,col-1:col+2]
+            tree_state = self.burn_trees(row, col, neighbors)
+            if tree_state == 3:
+                self.lit_tree = True
+            return tree_state
+        
+        return tree_state
+    
     def run(self,steps=-1):
         
         step = 0
