@@ -1,19 +1,14 @@
 from grid import Grid
 import random
-import copy
 import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib import cm
-from matplotlib import animation as animation
 
-class WildFireSimulation:
+class WildFireSimulation(Grid):
     def __init__(self, rows, cols):
-        self.grid = Grid(rows, cols)
-        self.current_forest = self.grid.init_grid()
+        super().__init__(rows,cols)
 
         #plotting functions
-        self.grid.visualize_trees() # to show how different trees are placed on the grid
-        self.grid.visualize_altitude()
+        self.visualize_trees() # to show how different trees are placed on the grid
+        self.visualize_altitude()
         
         self.history = [] # stores a list of forest states
         self.history.append(np.copy(self.current_forest))
@@ -27,8 +22,8 @@ class WildFireSimulation:
         # then the cell will be updated according to the rules
 
         state = self.history[-1]
-        for row in range(1, self.grid.rows - 1):
-            for col in range(1, self.grid.cols - 1):
+        for row in range(1, self.rows - 1):
+            for col in range(1, self.cols - 1):
                 
                 # burning cell becomes burnt
                 if state[row][col] == 3:
@@ -46,59 +41,12 @@ class WildFireSimulation:
                     #     [state[i][j] for j in range(col - 1, col + 2) if (i, j) != (row, col)] for i in range(row - 1, row + 2)
                     #     ]
                     # print("-----------------",neighbors)
-                    self.current_forest[row][col] = self.grid.burn_trees(row, col, neighbors)
+                    self.current_forest[row][col] = self.burn_trees(row, col, neighbors)
         if not np.array_equal(state, self.current_forest):
             self.history.append(np.copy(self.current_forest))
         else:
             self.converged = True
         return self.current_forest
-    
-    def animate(self, steps):
-        animations = []
-        fig = plt.figure()
-        for _ in range(steps):
-            # update_grid()
-            new_grid = copy.deepcopy(self.update_grid())
-            grid_arr = np.array(new_grid)
-
-            # visualize
-            ani = plt.imshow(grid_arr, animated=True, interpolation="none", cmap=cm.viridis)
-            animations.append([ani])
-            
-        gif = animation.ArtistAnimation(fig, animations, interval=100, blit=True,repeat_delay=100)
-        gif.save('plots/gif-tree-type.gif')
-        plt.show()
-
-    
-    def plot_distribution(self, history):
-        plot_empty = []
-        plot_trees = []
-        plot_burning = []
-        plot_burned = []
-
-        for state in history:
-            num_empty = np.count_nonzero(state == 1) #TODO empty may be removed
-            num_trees = np.count_nonzero(state == 2) 
-            num_burning = np.count_nonzero(state == 3)
-            num_burned = np.count_nonzero(state == 4)
-
-            plot_empty.append(num_empty)
-            plot_trees.append(num_trees)
-            plot_burning.append(num_burning)
-            plot_burned.append(num_burned)
-
-        time_steps = range(len(plot_empty))
-
-        plt.figure()
-        plt.plot(time_steps, plot_empty, label='Empty')
-        plt.plot(time_steps, plot_trees, label='Trees')
-        plt.plot(time_steps, plot_burning, label='Burning')
-        plt.plot(time_steps, plot_burned, label='Burned')
-        plt.xlabel('Time Step')
-        plt.ylabel('Number of Cells')
-        plt.title('Distribution of Cells over Time')
-        plt.legend()
-        plt.savefig('plots/plot_empty.png')
 
     def run(self,steps):
         for _ in range(steps):
@@ -109,40 +57,3 @@ class WildFireSimulation:
     def reset(self,steps):
         self.converged = False
         self.history = []
-
-    def run_simulations(self, n_simulations=100):
-        burned_plot = []
-
-        for _ in range(n_simulations):
-            simulation = WildFireSimulation(rows, cols)
-            simulation.run(steps)
-            
-            #count burned trees
-            print(simulation.history[-1])
-            burned_trees = np.count_nonzero(simulation.history[-1] == 4)
-            burned_plot.append(burned_trees)
-
-        plt.figure()
-        plt.hist(burned_plot, bins='auto', edgecolor='black')
-
-        plt.xlabel('Value')
-        plt.ylabel('Frequency')
-        plt.title('Histogram of burned_plot')
-
-        plt.savefig('plots/simulation.png')
-        # plt.show()
-        
-if __name__=="__main__":
-    # Example:
-    rows = 100
-    cols = 100
-    steps = 200
-    
-    simulation = WildFireSimulation(rows, cols)
-    simulation.run(steps) # without animation
-    # simulation.animate(steps) # with animation
-    # simulation.plot_distribution(simulation.history)
-    print(len(simulation.history))
-
-
-

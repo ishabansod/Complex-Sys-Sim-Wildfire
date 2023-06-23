@@ -3,14 +3,21 @@ import numpy as np
 from matplotlib import cm
 import random
 import math
+import os
 
 class Grid:
     def __init__(self, rows, cols):
+        
         self.rows = rows
         self.cols = cols
+        
+        # auxiliary information grids
         self.trees = self.init_trees(percentage_trees= (50,50),trees=True)
         self.density = self.init_density(density=True)
         self.altitude = self.init_altitude(altitude=True)
+        
+        # main simulation grid
+        self.current_forest = self.init_grid()
     
     def init_trees(self, percentage_trees=(30, 70), trees=True):
         # two types - 1: agricultural areas and 2: pine trees
