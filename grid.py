@@ -25,12 +25,14 @@ class Grid:
         # forest = [[2 for _ in range(self.cols)] for _ in range(self.rows)]
         grid_density = 0.3
         forest = [[1 if random.random() < grid_density else 2 for _ in range(self.cols)] for _ in range(self.rows)]
-        start_fire_x = 0
-        start_fire_y = self.rows // 2
+        start_fire_x = random.randint(0, self.cols - 1)
+        start_fire_y = random.randint(0, self.rows - 1)
 
+        # forest[start_fire_x][start_fire_y] = 3  # start fire at a random point
         for row in range(start_fire_y - 1, start_fire_y + 2):
-            for col in range(start_fire_x, start_fire_x + 2):
-                forest[row][col] = 3  # start fire at the y axis center
+            for col in range(start_fire_x - 1, start_fire_x + 2):
+                if 0 <= row < self.rows and 0 <= col < self.cols:
+                    forest[row][col] = 3  # start fire at a random point
 
         return forest
     
@@ -41,8 +43,8 @@ class Grid:
 
         # probability of burning due to tree type       
         p_tree_type = {
-            1: -0.3,
-            2: 0.3
+            1: -0.5,
+            2: 0.4
         } # values from the ref paper
         p_tree = p_tree_type[self.trees[x][y]]
 
