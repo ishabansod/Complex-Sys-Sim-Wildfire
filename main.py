@@ -41,6 +41,9 @@ if __name__=="__main__":
     
     simulation = WildFireSimulation(rows, cols)
     visualization = Visualize()
+    
+    visualization.show_grid(simulation)
+    
     #simulation.run(steps) # without animation
     visualization.animate(simulation,100) # with animation
     visualization.plot_distribution(simulation)

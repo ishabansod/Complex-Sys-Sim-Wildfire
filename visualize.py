@@ -10,11 +10,26 @@ import matplotlib.pyplot as plt
 from matplotlib import cm
 from matplotlib import animation as animation
 import numpy as np
+import os
 
 class Visualize():
     def __init__(self):
         pass
     
+    def colormap(self, title, array):
+        np_array = np.array(array)
+        plt.figure()
+        plt.imshow(np_array, interpolation="none", cmap=cm.viridis) # cmap=cm.Reds
+        plt.colorbar()
+        plt.title(title)
+        plt.savefig(os.path.join('plots', title))
+        plt.show()
+    
+    def show_grid(self,sim):
+        self.colormap("Types of Trees Map", sim.trees)
+        self.colormap("Density Map", sim.density)
+        self.colormap("Altitude Map", sim.altitude)
+        
     def animate(self,sim, steps):
         animations = []
         fig = plt.figure()

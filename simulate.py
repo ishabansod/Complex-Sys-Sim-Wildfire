@@ -5,10 +5,6 @@ import numpy as np
 class WildFireSimulation(Grid):
     def __init__(self, rows, cols):
         super().__init__(rows,cols)
-
-        #plotting functions
-        self.visualize_trees() # to show how different trees are placed on the grid
-        self.visualize_altitude()
         
         self.history = [] # stores a list of forest states
         self.history.append(np.copy(self.current_forest))
