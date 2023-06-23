@@ -12,7 +12,8 @@ class Grid:
         self.trees = self.init_trees(percentage_trees= (50,50),trees=True)
         self.density = self.init_density(density=True)
         self.altitude = self.init_altitude(altitude=True)
-        
+        self.wind = self.init_wind(wind=True)
+
         # main simulation grid
         self.current_forest = self.init_grid()
         
@@ -52,13 +53,16 @@ class Grid:
         } # values from the ref paper
         p_density = p_density_type[self.density[x][y]]
 
+        # probability of burning due to wind type
+        p_wind = self.wind
+
         #currently probability is calculated for each neighbor (TODO: can be changed)
         for row in range(3):
             for col in range(3):
                 if neighbors[row][col] == 3:
                     diag = self.is_diagonal(row, col, x, y)
                     slope = self.calc_slope(self.altitude[row][col], self.altitude[x][y], diag)
-                    burn_prob = p * (1 + p_tree) * (1 + p_density) * slope  # add other factors here 
+                    burn_prob = p * p_wind * (1 + p_tree) * (1 + p_density) * slope  # add other factors here 
                     if burn_prob > random.random():
                         return 3
         return 2
@@ -93,6 +97,19 @@ class Grid:
 
         return tree_matrix
     
+    def init_wind(self, wind=False):
+        # simplified burn probability depending on wind
+        # Set initial conditions
+        wind_speed = 10 #input('Give the speed of the wind in m/s:')
+        wind_direction = np.pi #input('Give the direction of the wind as angle between 0 and 2pi:')
+        V = wind_speed
+        theta = wind_direction # angle between fire propagation and wind direction
+        c_1 = .045
+        c_2 = .131
+        f_t = np.exp(V * c_2 *(np.cos(theta)-1))
+        p_w = np.exp(c_1 * V)*f_t
+        return p_w
+
     def init_density(self, density):
         # three types - 1: sparse, 2: normal and 3: dense
         density_matrix = [[0 for _ in range(self.cols)] for _ in range(self.rows)]
