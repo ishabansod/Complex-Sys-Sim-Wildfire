@@ -1,13 +1,25 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Jun 23 13:14:12 2023
+
+@author: gaston.barboza@goflink.com
+"""
 import copy
 import matplotlib.pyplot as plt
 from matplotlib import cm
 from matplotlib import animation as animation
+from matplotlib import colors
 import numpy as np
 import os
 
 class Visualize():
     def __init__(self):
-        pass
+        self.cmap = colors.ListedColormap(['brown', 'green','red', 'black'])
+        self.boundaries = [1, 1.5, 2.5, 3.5,4.5]
+        self.norm = colors.BoundaryNorm(self.boundaries, self.cmap.N, clip=True)
+
+
     
     def colormap(self, title, array):
         np_array = np.array(array)
@@ -23,7 +35,7 @@ class Visualize():
         self.colormap("Density Map", sim.density)
         self.colormap("Altitude Map", sim.altitude)
         
-    def animate(self, sim, steps):
+    def animate(self,sim, steps):
         animations = []
         fig = plt.figure()
         for _ in range(steps):
@@ -32,7 +44,7 @@ class Visualize():
             grid_arr = np.array(new_grid)
 
             # visualize
-            ani = plt.imshow(grid_arr, animated=True, interpolation="none", cmap=cm.viridis)
+            ani = plt.imshow(grid_arr, animated=True, interpolation="none", cmap=self.cmap)
             animations.append([ani])
             
         gif = animation.ArtistAnimation(fig, animations, interval=100, blit=True,repeat_delay=100)
