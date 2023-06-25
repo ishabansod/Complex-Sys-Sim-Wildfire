@@ -9,15 +9,60 @@ class Grid:
         self.cols = cols
         self.burned_trees = 0
         
+        # intialize parameters
+        self.params = self.init_params()
+        
         # auxiliary information grids
-        self.trees = self.init_trees(percentage_trees= (50,50), trees=True, rand=False)
-        self.density = self.init_density(density=True)
-        self.altitude = self.init_altitude(altitude=True)
-        self.wind = self.init_wind(wind=True)
+        self.trees = self.init_trees()
+        self.density = self.init_density()
+        self.altitude = self.init_altitude()
+        self.wind = self.init_wind()
 
         # main simulation grid
         self.current_forest = self.init_grid()
+
+    ## PARAMETERS ##
+    
+    def init_params(self):
+        params = {}
+
+        # Vegetation parameters
+        params['species_enabled'] = True
+        params['percentage_trees'] = (30,70)
+        params['rand'] = True
+
+        # Wind parameters
+        params['wind_enabled'] = True
+        params['wind_speed'] = 10
+        params['wind_angle'] = 180
+        params['wind_c1'] = 0.045
+        params['wind_c2'] = 0.131
         
+        # Density parameters
+        params['density_enabled'] = True
+
+        # Altitude parameters
+        params['peak_enabled'] = True
+        params['peak_height'] = 10
+        params['peak_offset_x'] = 20
+        params['peak_offset_y'] = 20
+        params['peak_noise'] = 0.3
+        params['peak_slope'] = 0.1
+        
+        # Probability parameters
+        params['tree_burn_prob'] = 0.5 # base burn probability
+        params['prob_delta_tree1'] = -0.5 # probability delta for trees of type 1
+        params['prob_delta_tree2'] = 0.4 # p. d. for trees of type 2
+        params['prob_delta_dens1'] = -0.4 # p. d. for density type 1
+        params['prob_delta_dens2'] = 0 # p. d. for density type 2
+        params['prob_delta_dens3'] = 0.3 #p. d. for density type 3
+        
+        return params
+    
+    def set_params(self, key, value):
+        self.params[key] = value
+        return
+
     ## MAIN GRID FOR SIMULATIONS ##
     
     def init_grid(self):
@@ -38,22 +83,21 @@ class Grid:
         return forest
     
     def burn_trees(self, x, y, neighbors):
-        # TODO add height, possibly wind too
         # probability of burning
-        p = 0.5
+        p = self.params['tree_burn_prob']
 
         # probability of burning due to tree type       
         p_tree_type = {
-            1: -0.5,
-            2: 0.4
+            1: self.params['prob_delta_tree1'],
+            2: self.params['prob_delta_tree2']
         } # values from the ref paper
         p_tree = p_tree_type[self.trees[x][y]]
 
         # probability of burning due to density
         p_density_type = {
-            1: -0.4,
-            2: 0,
-            3: 0.3
+            1: self.params['prob_delta_dens1'],
+            2: self.params['prob_delta_dens2'],
+            3: self.params['prob_delta_dens3']
         } # values from the ref paper
         p_density = p_density_type[self.density[x][y]]
 
@@ -73,11 +117,15 @@ class Grid:
         
     ## AUXILIARY INFORMATION GRIDS ##
     
-    def init_trees(self, percentage_trees=(30, 70), trees=True, rand = False):
+    def init_trees(self):
+        
+        percentage_trees = self.params['percentage_trees']
+        rand = self.params['rand']
+        
         # two types - 1: agricultural areas and 2: pine trees
         tree_matrix = [[0 for _ in range(self.cols)] for _ in range(self.rows)]
 
-        if not trees:  # only one type of tree
+        if not self.params['species_enabled']:  # only one type of tree
             for i in range(self.rows):
                 for j in range(self.cols):
                     tree_matrix[i][j] = 1
@@ -127,28 +175,30 @@ class Grid:
 
         return tree_matrix
     
-    def init_wind(self, wind=False):
+    def init_wind(self):
         # simplified burn probability depending on wind
         # Set initial conditions
-        wind_speed = 10 #input('Give the speed of the wind in m/s:')
-        wind_direction = 2* np.pi #input('Give the direction of the wind as angle between 0 and 2pi:')
-        V = wind_speed
-        theta = wind_direction # angle between fire propagation and wind direction
-        c_1 = .045
-        c_2 = .131
-        f_t = np.exp(V * c_2 *(np.cos(theta)-1))
-        p_w = np.exp(c_1 * V)*f_t
+        
+        if self.params['wind_enabled']:
+            V = self.params['wind_speed']
+            theta = self.params['wind_angle']/180*np.pi
+            
+            c_1 = self.params['wind_c1']
+            c_2 = self.params['wind_c2']
+            
+            f_t = np.exp(V * c_2 *(np.cos(theta)-1))
+            p_w = np.exp(c_1 * V)*f_t
+        
+        else:
+            p_w = 1
+        
         return p_w
 
-    def init_density(self, density):
+    def init_density(self):
         # three types - 1: sparse, 2: normal and 3: dense
         density_matrix = [[0 for _ in range(self.cols)] for _ in range(self.rows)]
     
-        if not density:  # uniform tree density of the grid
-            for i in range(self.rows):
-                for j in range(self.cols):
-                    density_matrix[i][j] = 1
-        else:
+        if self.params['density_enabled']:
             for i in range(self.rows):
                 for j in range(self.cols):
                     if i < self.rows // 3:
@@ -157,30 +207,32 @@ class Grid:
                         density_matrix[i][j] = 2 # normal
                     else:
                         density_matrix[i][j] = 3 # dense
+        else:  # uniform tree density of the grid
+            for i in range(self.rows):
+                for j in range(self.cols):
+                    density_matrix[i][j] = 1
         
         return density_matrix
     
-    def init_altitude(self, altitude):
+    def init_altitude(self):
         alt_matrix = [[0 for _ in range(self.cols)] for _ in range(self.rows)]
 
-        max_height = 10
-        offset_x = 20
-        offset_y = 20
+        max_height = self.params['peak_height']
+        offset_x = self.params['peak_offset_x']
+        offset_y = self.params['peak_offset_y']
 
-        noise_factor = 0.3  # Adjust this to control the level of noise
+        noise_factor = self.params['peak_noise']  # Adjust this to control the level of noise
+        
+        slope = self.params['peak_slope']
 
-        if not altitude:  # uniform grid height
-            for i in range(self.rows):
-                for j in range(self.cols):
-                    alt_matrix[i][j] = 1
-        else:  # mountain-like altitude distribution
+        if self.params['peak_enabled']:  # mountain-like altitude distribution
             for i in range(self.rows):
                 for j in range(self.cols):
                     # Calculate the distance of the cell from the offset center of the grid
                     distance = math.sqrt((i - self.rows/2 + offset_y)**2 + (j - self.cols/2 + offset_x)**2)
 
                     # Calculate the height of the mountain at that cell
-                    height = max_height * math.exp(-0.1 * distance)
+                    height = max_height * math.exp(- slope * distance)
 
                     # Add random noise to the height
                     noise = random.uniform(-1, 1) * noise_factor
@@ -188,6 +240,10 @@ class Grid:
 
                     # Assign the height to the cell in the grid
                     alt_matrix[i][j] = height
+        else:
+            for i in range(self.rows):
+                for j in range(self.cols):
+                    alt_matrix[i][j] = 1
             
         return alt_matrix
 
