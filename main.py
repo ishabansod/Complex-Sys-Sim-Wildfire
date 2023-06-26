@@ -13,6 +13,9 @@ if __name__=="__main__":
 
     if not os.path.exists('plots'):
         os.makedirs('plots')
+
+    if not os.path.exists('data'):
+        os.makedirs('data')
     
     # Example:
     rows = 100
@@ -28,7 +31,27 @@ if __name__=="__main__":
     # visualization.animate(sim, steps=200) # with animation
     #visualization.plot_distribution(simulation)
     
-    burned = [get_burnt(sim) for _ in range(n_simulations)]
+    burned = [WildFireSimulation.get_burnt(sim) for _ in range(n_simulations)]
+    # burned = [WildFireSimulation.get_burnt(sim) for _ in range(n_simulations)]
+    # plt.hist(burned)
+    # plt.show()
+
+    plotter = MakePlots(sim)
+
+    # Define parameter and its range for sensitivity analysis
+    # parameter = 'prob_delta_tree1'
+    # values = [-0.5, -0.4, -0.3, -0.2, -0.1, 0.0, 0.1, 0.2, 0.3, 0.4]
+
+    # # Perform sensitivity analysis and plot
+    # plotter.sensitivity_analysis(parameter, values)
+
+    # perform sensitivity analysis for multiple parameters - TODO change params here
+    parameters = ['prob_delta_tree1', 'prob_delta_dens1', 'wind_speed']
+    values = [[0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0],
+              [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0],
+              [5, 10, 15, 20, 25, 30, 35, 40, 45, 50]]
+    for i, parameter in enumerate(parameters):
+        plotter.sensitivity_analysis(sim, parameter, values[i], n_simulations)
 
     def plot_loghist(data, bins):
         hist, bins = np.histogram(data, bins=bins)
@@ -46,7 +69,9 @@ if __name__=="__main__":
         df = pd.DataFrame(data)
         df.to_excel(file_path, index=False)
 
-    file_path = 'C:\\Users\\cyril\\OneDrive\\Documenten\\GitHub\\Complex-Sys-Sim-Wildfire\\burned.xlsx'
+    # Saving in 'plots' folder
+    file_name = 'burned.xlsx'
+    file_path = os.path.join('data', file_name)
     save_list_to_excel(burned, file_path)
 
 def calculate_confidence_interval(data):
@@ -78,24 +103,3 @@ def plot_mean_with_confidence_intervals(parameter, mean, CI):
     plt.show()
 
 plot_mean_with_confidence_intervals(parameter_list, burned_mean_list, burned_CI_list)
-
-    # burned = [WildFireSimulation.get_burnt(sim) for _ in range(n_simulations)]
-    # plt.hist(burned)
-    # plt.show()
-
-    plotter = MakePlots(sim)
-
-    # Define parameter and its range for sensitivity analysis
-    # parameter = 'prob_delta_tree1'
-    # values = [-0.5, -0.4, -0.3, -0.2, -0.1, 0.0, 0.1, 0.2, 0.3, 0.4]
-
-    # # Perform sensitivity analysis and plot
-    # plotter.sensitivity_analysis(parameter, values)
-
-    # perform sensitivity analysis for multiple parameters - TODO change params here
-    parameters = ['prob_delta_tree1', 'prob_delta_dens1', 'wind_speed']
-    values = [[0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0],
-              [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0],
-              [5, 10, 15, 20, 25, 30, 35, 40, 45, 50]]
-    for i, parameter in enumerate(parameters):
-        plotter.sensitivity_analysis(sim, parameter, values[i], n_simulations)
