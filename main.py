@@ -5,6 +5,7 @@ from tqdm import tqdm
 import matplotlib.pyplot as plt
 import statistics
 import math
+import csv
 
 def get_burnt(sim,steps=-1): 
     sim.run(steps)
@@ -28,11 +29,29 @@ if __name__=="__main__":
     #visualization.plot_distribution(simulation)
     
     burned = [get_burnt(sim) for _ in range(n_simulations)]
-    plt.hist(burned)
-    plt.title("Distribution of final fire size for fixed density/vegetation/elevation/wind vector")
-    plt.ylabel("Frequency")
-    plt.xlabel("Final fire size $N_F$")
-    plt.show()
+
+    def plot_loghist(data, bins):
+        hist, bins = np.histogram(data, bins=bins)
+        logbins = np.logspace(np.log10(bins[0]),np.log10(bins[-1]),len(bins))
+        plt.hist(data, bins=logbins)
+        plt.xscale('log')
+        plt.title("Distribution of final fire size for fixed density/vegetation/elevation/wind vector")
+        plt.ylabel("Frequency")
+        plt.xlabel("Final fire size $N_F$")
+        plt.show()
+    
+    plot_loghist(burned, 100)
+
+    def save_list_to_csv(data_list, file_path):
+        with open(file_path, 'w', newline='') as csv_file:
+            writer = csv.writer(csv_file)
+            writer.writerow(data_list)
+
+    # Example usage
+    file_path = 'C:\\Users\\cyril\\OneDrive\\Documenten\\GitHub\\Complex-Sys-Sim-Wildfire\\burned'
+
+    save_list_to_csv(burned, file_path)
+    print("List saved to CSV file.")
 
 def calculate_confidence_interval(data):
         n = len(data)
