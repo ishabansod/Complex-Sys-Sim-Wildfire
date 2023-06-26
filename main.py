@@ -20,7 +20,7 @@ if __name__=="__main__":
     # Example:
     rows = 100
     cols = 100
-    n_simulations=500
+    n_simulations=1000
     
     sim = WildFireSimulation(rows, cols)
     
@@ -48,8 +48,8 @@ if __name__=="__main__":
     # perform sensitivity analysis for multiple parameters - TODO change params here
     parameters = ['prob_delta_tree1', 'prob_delta_dens1', 'wind_speed']
     values = [[0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0],
-              [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0],
-              [5, 10, 15, 20, 25, 30, 35, 40, 45, 50]]
+             [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0],
+             [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20]]
     for i, parameter in enumerate(parameters):
         plotter.sensitivity_analysis(sim, parameter, values[i], n_simulations)
 
@@ -63,16 +63,7 @@ if __name__=="__main__":
         plt.xlabel("Final fire size $N_F$")
         plt.show()
     
-    plot_loghist(burned, 100)
-
-    def save_list_to_excel(data, file_path):
-        df = pd.DataFrame(data)
-        df.to_excel(file_path, index=False)
-
-    # Saving in 'plots' folder
-    file_name = 'burned.xlsx'
-    file_path = os.path.join('data', file_name)
-    save_list_to_excel(burned, file_path)
+    #plot_loghist(burned, 100)
 
 def calculate_confidence_interval(data):
         n = len(data)
@@ -102,4 +93,4 @@ def plot_mean_with_confidence_intervals(parameter, mean, CI):
     plt.legend()
     plt.show()
 
-plot_mean_with_confidence_intervals(parameter_list, burned_mean_list, burned_CI_list)
+#plot_mean_with_confidence_intervals(parameter_list, burned_mean_list, burned_CI_list)
