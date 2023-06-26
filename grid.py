@@ -28,7 +28,7 @@ class Grid:
 
         # Vegetation parameters
         params['species_enabled'] = True
-        params['percentage_trees'] = (30,70)
+        params['percentage_tree_1'] = 30 # TODO change to input one value
         params['rand'] = True
 
         # Wind parameters
@@ -120,7 +120,9 @@ class Grid:
     
     def init_trees(self):
         
-        percentage_trees = self.params['percentage_trees']
+        percentage_tree_1 = self.params['percentage_tree_1']
+        percentage_tree_2 = 100 - percentage_tree_1
+        percentage_trees = (percentage_tree_1, percentage_tree_2)
         rand = self.params['rand']
         
         # two types - 1: agricultural areas and 2: pine trees
