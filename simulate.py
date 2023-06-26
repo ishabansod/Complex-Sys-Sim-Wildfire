@@ -52,10 +52,14 @@ class WildFireSimulation(Grid):
         
         return tree_state
     
+    def get_burnt(sim,steps=-1): 
+        sim.run(steps)
+        burned = (sim.burned_trees)
+        sim.reset()
+        return burned
+
     def run(self,steps=-1):
-        
         step = 0
-        
         while steps==-1 or step < steps:
             self.update_grid()
             if self.converged:
