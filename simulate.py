@@ -52,10 +52,11 @@ class WildFireSimulation(Grid):
         
         return tree_state
     
-    def get_burnt(sim,steps=-1): 
-        sim.run(steps)
-        burned = (sim.burned_trees)
-        sim.reset()
+    def get_burnt(self,steps=-1): 
+        # print("percentage_tree_1----", self.params['percentage_tree_1'])
+        self.run(steps)
+        burned = self.burned_trees
+        self.reset()
         return burned
 
     def run(self,steps=-1):

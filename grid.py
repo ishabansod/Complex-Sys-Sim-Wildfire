@@ -39,7 +39,7 @@ class Grid:
         params['wind_c2'] = 0.131
         
         # Density parameters
-        params['grid_density'] = 0.3
+        params['grid_density'] = 0.5
         params['density_enabled'] = True
 
         # Altitude parameters
@@ -135,7 +135,7 @@ class Grid:
                 raise ValueError("The value should be between 0 and 100.")
             percentage_tree_2 = 100 - percentage_tree_1
             percentage_trees = (percentage_tree_1, percentage_tree_2)
-            
+            # print("percentage_trees ---- ", percentage_trees)
             # randomly placed two types of trees
             if rand:
                 shape = (self.rows, self.cols)
