@@ -3,8 +3,8 @@ import random
 import numpy as np
 
 class WildFireSimulation(Grid):
-    def __init__(self, rows, cols):
-        super().__init__(rows,cols)
+    def __init__(self, rows, cols,init_params=True):
+        super().__init__(rows,cols,init_params)
         
         self.history = [] # stores a list of forest states
         self.history.append(np.copy(self.current_forest))
