@@ -49,6 +49,7 @@ class Grid:
         params['peak_offset_y'] = 20
         params['peak_noise'] = 0.3
         params['peak_slope'] = 0.1
+        params['alpha'] = 0.078 
         
         # Probability parameters
         params['tree_burn_prob'] = 0.5 # base burn probability
@@ -57,6 +58,8 @@ class Grid:
         params['prob_delta_dens1'] = -0.4 # p. d. for density type 1
         params['prob_delta_dens2'] = 0 # p. d. for density type 2
         params['prob_delta_dens3'] = 0.3 #p. d. for density type 3
+
+
         
         return params
     
@@ -264,5 +267,5 @@ class Grid:
             Theta = math.atan((neighbor - cell) / length)
         else:
             Theta = math.atan((neighbor - cell) / (length * math.sqrt(2)))
-        a = 1 #constant value
+        a = self.params['alpha'] #constant value
         return np.exp(a * Theta)
