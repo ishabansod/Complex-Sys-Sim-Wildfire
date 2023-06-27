@@ -84,4 +84,4 @@ class WildFireSimulation(Grid):
             step += 1
     
     def reset(self):
-        self.__init__(self.rows,self.cols)
+        self.__init__(self.rows,self.cols,init_params=False)
