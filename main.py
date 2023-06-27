@@ -47,7 +47,7 @@ if __name__=="__main__":
 
     # perform sensitivity analysis for multiple parameters - TODO change params here
     parameters = ['prob_delta_tree1', 'prob_delta_dens1', 'wind_speed']
-    values = [[0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0],
+    values = [[0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
              [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0],
              [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20]]
     for i, parameter in enumerate(parameters):
