@@ -3,14 +3,16 @@ import random
 import math
 
 class Grid:
-    def __init__(self, rows, cols):
+    def __init__(self, rows, cols, init_params=True):
         
         self.rows = rows
         self.cols = cols
         self.burned_trees = 0
+        self.total_trees = 0
         
         # intialize parameters
-        self.params = self.init_params()
+        if init_params==True:
+            self.params = self.init_params( )
         
         # auxiliary information grids
         self.trees = self.init_trees()
@@ -27,23 +29,23 @@ class Grid:
         params = {}
 
         # Vegetation parameters
-        params['species_enabled'] = True
+        params['species_enabled'] = False
         params['percentage_tree_1'] = 30
         params['rand'] = True
 
         # Wind parameters
-        params['wind_enabled'] = True
+        params['wind_enabled'] = False
         params['wind_speed'] = 10
         params['wind_angle'] = 180
         params['wind_c1'] = 0.045
         params['wind_c2'] = 0.131
         
         # Density parameters
-        params['grid_density'] = 0.5
-        params['density_enabled'] = True
+        params['grid_density'] = 0.3
+        params['density_enabled'] = False
 
         # Altitude parameters
-        params['peak_enabled'] = True
+        params['peak_enabled'] = False
         params['peak_height'] = 10
         params['peak_offset_x'] = 20
         params['peak_offset_y'] = 20
@@ -52,14 +54,12 @@ class Grid:
         params['alpha'] = 0.078 
         
         # Probability parameters
-        params['tree_burn_prob'] = 0.5 # base burn probability
-        params['prob_delta_tree1'] = -0.5 # probability delta for trees of type 1
+        params['tree_burn_prob'] = 1 # base burn probability
+        params['prob_delta_tree1'] = 0 # probability delta for trees of type 1
         params['prob_delta_tree2'] = 0.4 # p. d. for trees of type 2
-        params['prob_delta_dens1'] = -0.4 # p. d. for density type 1
+        params['prob_delta_dens1'] = 0 # p. d. for density type 1
         params['prob_delta_dens2'] = 0 # p. d. for density type 2
         params['prob_delta_dens3'] = 0.3 #p. d. for density type 3
-
-
         
         return params
     
@@ -74,7 +74,8 @@ class Grid:
         # forest = [[2 for _ in range(self.cols)] for _ in range(self.rows)]
         grid_density = self.params['grid_density']
         edge = lambda row,col : row == 0 or col == 0 or row == self.rows-1 or col == self.cols-1
-        forest = [[1 if random.random() < grid_density or edge(row,col) else 2 for col in range(self.cols)] for row in range(self.rows)]
+        forest = np.array([[1 if random.random() > grid_density or edge(row,col) else 2 for col in range(self.cols)] for row in range(self.rows)])
+        self.total_trees = np.count_nonzero(forest==2)
         start_fire_x = random.randint(0, self.cols - 1)
         start_fire_y = random.randint(0, self.rows - 1)
 

@@ -52,6 +52,22 @@ class WildFireSimulation(Grid):
         
         return tree_state
     
+    def get_correlation(self):
+        state = self.history[-1].flatten()
+        corrs = np.array([self.indicator(t1,t2,i,j) for i,t1 in enumerate(state) for j,t2 in enumerate(state[i+1:])])
+        distance, frequency = np.unique(corrs[corrs.nonzero()],return_counts=True)
+        return distance, frequency
+    
+    def indicator(self,t1,t2,i,j):
+        if t1 == t2 and t1 == 4:
+            x1 = i // self.cols
+            y1 = i % self.cols
+            x2 = (i+j+1) // self.cols
+            y2 = (i+j+1) % self.cols
+            d = (x1-x2)**2+(y1-y2)**2
+            return d
+        return 0
+    
     def get_burnt(self,steps=-1): 
         # print("percentage_tree_1----", self.params['percentage_tree_1'])
         self.run(steps)
@@ -68,4 +84,4 @@ class WildFireSimulation(Grid):
             step += 1
     
     def reset(self):
-        self.__init__(self.rows,self.cols)
+        self.__init__(self.rows,self.cols,init_params=False)
