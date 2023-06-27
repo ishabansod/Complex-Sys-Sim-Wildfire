@@ -28,7 +28,7 @@ class Grid:
 
         # Vegetation parameters
         params['species_enabled'] = True
-        params['percentage_tree_1'] = 30 # TODO change to input one value
+        params['percentage_tree_1'] = 30
         params['rand'] = True
 
         # Wind parameters
@@ -39,7 +39,7 @@ class Grid:
         params['wind_c2'] = 0.131
         
         # Density parameters
-        params['grid_density'] = 0.3
+        params['grid_density'] = 0.5
         params['density_enabled'] = True
 
         # Altitude parameters
@@ -49,6 +49,7 @@ class Grid:
         params['peak_offset_y'] = 20
         params['peak_noise'] = 0.3
         params['peak_slope'] = 0.1
+        params['alpha'] = 0.078 
         
         # Probability parameters
         params['tree_burn_prob'] = 0.5 # base burn probability
@@ -57,6 +58,8 @@ class Grid:
         params['prob_delta_dens1'] = -0.4 # p. d. for density type 1
         params['prob_delta_dens2'] = 0 # p. d. for density type 2
         params['prob_delta_dens3'] = 0.3 #p. d. for density type 3
+
+
         
         return params
     
@@ -119,10 +122,6 @@ class Grid:
     ## AUXILIARY INFORMATION GRIDS ##
     
     def init_trees(self):
-        
-        percentage_tree_1 = self.params['percentage_tree_1']
-        percentage_tree_2 = 100 - percentage_tree_1
-        percentage_trees = (percentage_tree_1, percentage_tree_2)
         rand = self.params['rand']
         
         # two types - 1: agricultural areas and 2: pine trees
@@ -134,10 +133,12 @@ class Grid:
                     tree_matrix[i][j] = 1
 
         else:
-            total_percentage = sum(percentage_trees)
-            if total_percentage != 100:
-                raise ValueError("The sum of percentages should be 100.")
-            
+            percentage_tree_1 = self.params['percentage_tree_1']
+            if percentage_tree_1 > 100 or percentage_tree_1 < 0:
+                raise ValueError("The value should be between 0 and 100.")
+            percentage_tree_2 = 100 - percentage_tree_1
+            percentage_trees = (percentage_tree_1, percentage_tree_2)
+            # print("percentage_trees ---- ", percentage_trees)
             # randomly placed two types of trees
             if rand:
                 shape = (self.rows, self.cols)
@@ -266,5 +267,5 @@ class Grid:
             Theta = math.atan((neighbor - cell) / length)
         else:
             Theta = math.atan((neighbor - cell) / (length * math.sqrt(2)))
-        a = 1 #constant value
+        a = self.params['alpha'] #constant value
         return np.exp(a * Theta)

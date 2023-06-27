@@ -30,11 +30,6 @@ if __name__=="__main__":
     
     # visualization.animate(sim, steps=200) # with animation
     #visualization.plot_distribution(simulation)
-    
-    burned = [WildFireSimulation.get_burnt(sim) for _ in range(n_simulations)]
-    # burned = [WildFireSimulation.get_burnt(sim) for _ in range(n_simulations)]
-    # plt.hist(burned)
-    # plt.show()
 
     plotter = MakePlots(sim)
 
@@ -46,12 +41,14 @@ if __name__=="__main__":
     # plotter.sensitivity_analysis(parameter, values)
 
     # perform sensitivity analysis for multiple parameters - TODO change params here
-    parameters = ['prob_delta_tree1', 'prob_delta_dens1', 'wind_speed']
-    values = [[0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0],
-             [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0],
+    parameters = ['percentage_tree_1', 'wind_speed'] #'prob_delta_dens1'
+    values = [[0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
+             # [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0],
              [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20]]
     for i, parameter in enumerate(parameters):
         plotter.sensitivity_analysis(sim, parameter, values[i], n_simulations)
+
+    
 
     def plot_loghist(data, bins):
         hist, bins = np.histogram(data, bins=bins)
@@ -75,6 +72,10 @@ def calculate_confidence_interval(data):
         confidence_interval = (mean - margin_of_error, mean + margin_of_error)
 
         return mean, confidence_interval
+
+burned = [sim.get_burnt() for _ in range(n_simulations)]
+# plt.hist(burned)
+# plt.show()
 
 parameter_list = [0, 1]
 burned_mean_list, burned_CI_list = [14], [[13.5, 14.5]]
