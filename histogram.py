@@ -69,9 +69,6 @@ for parameter in parameter_list:
         slope_list.append(slope)
         R_squared_list.append(r_squared)
 
-    print(R_squared_list)
-    print(slope_list)
-
     # Save data to list
     excel_file = 'C:\\Users\\cyril\\OneDrive\\Documenten\\GitHub\\Complex-Sys-Sim-Wildfire\\LinReg_data.xlsx'
     df = pd.DataFrame({'Slope': slope_list, 'R_squared': R_squared_list})
