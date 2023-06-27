@@ -53,20 +53,34 @@ class WildFireSimulation(Grid):
         return tree_state
     
     def get_correlation(self):
+        
         state = self.history[-1].flatten()
         corrs = np.array([self.indicator(t1,t2,i,j) for i,t1 in enumerate(state) for j,t2 in enumerate(state[i+1:])])
-        distance, frequency = np.unique(corrs[corrs.nonzero()],return_counts=True)
-        return distance, frequency
+        dist1, freq1 = np.unique(corrs[corrs[:,1]==1][:,0],return_counts=True)
+        dist2, freq2 = np.unique(corrs[:,0],return_counts=True)
+        rel_freq = []
+        
+        dist_iter = iter(dist2)
+        item = next(dist_iter)
+        j = 0
+        for i,d in enumerate(dist1):
+            while item != d:
+                item = next(dist_iter)
+                j += 1
+            rel_freq.append(freq1[i]/freq2[j])
+        m, b = np.polyfit(dist1,np.log(rel_freq),1)
+        
+        return -1/m
     
     def indicator(self,t1,t2,i,j):
+        x1 = i // self.cols
+        y1 = i % self.cols
+        x2 = (i+j+1) // self.cols
+        y2 = (i+j+1) % self.cols
+        d = (x1-x2)**2+(y1-y2)**2
         if t1 == t2 and t1 == 4:
-            x1 = i // self.cols
-            y1 = i % self.cols
-            x2 = (i+j+1) // self.cols
-            y2 = (i+j+1) % self.cols
-            d = (x1-x2)**2+(y1-y2)**2
-            return d
-        return 0
+            return [d,1]
+        return [d,0]
     
     def get_burnt(self,steps=-1): 
         # print("percentage_tree_1----", self.params['percentage_tree_1'])
