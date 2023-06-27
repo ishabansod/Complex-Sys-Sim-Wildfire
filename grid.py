@@ -8,6 +8,7 @@ class Grid:
         self.rows = rows
         self.cols = cols
         self.burned_trees = 0
+        self.total_trees = 0
         
         # intialize parameters
         self.params = self.init_params()
@@ -58,8 +59,6 @@ class Grid:
         params['prob_delta_dens1'] = -0.4 # p. d. for density type 1
         params['prob_delta_dens2'] = 0 # p. d. for density type 2
         params['prob_delta_dens3'] = 0.3 #p. d. for density type 3
-
-
         
         return params
     
@@ -74,7 +73,8 @@ class Grid:
         # forest = [[2 for _ in range(self.cols)] for _ in range(self.rows)]
         grid_density = self.params['grid_density']
         edge = lambda row,col : row == 0 or col == 0 or row == self.rows-1 or col == self.cols-1
-        forest = [[1 if random.random() < grid_density or edge(row,col) else 2 for col in range(self.cols)] for row in range(self.rows)]
+        forest = np.array([[1 if random.random() < grid_density or edge(row,col) else 2 for col in range(self.cols)] for row in range(self.rows)])
+        self.total_trees = np.count_nonzero(forest==2)
         start_fire_x = random.randint(0, self.cols - 1)
         start_fire_y = random.randint(0, self.rows - 1)
 
