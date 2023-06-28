@@ -29,23 +29,23 @@ class Grid:
         params = {}
 
         # Vegetation parameters
-        params['species_enabled'] = False
+        params['species_enabled'] = True
         params['percentage_tree_1'] = 30
         params['rand'] = True
 
         # Wind parameters
-        params['wind_enabled'] = False
+        params['wind_enabled'] = True
         params['wind_speed'] = 10
         params['wind_angle'] = 180
         params['wind_c1'] = 0.045
         params['wind_c2'] = 0.131
         
         # Density parameters
-        params['grid_density'] = 0.3
-        params['density_enabled'] = False
+        params['grid_density'] = 0.4
+        params['density_enabled'] = True
 
         # Altitude parameters
-        params['peak_enabled'] = False
+        params['peak_enabled'] = True
         params['peak_height'] = 10
         params['peak_offset_x'] = 20
         params['peak_offset_y'] = 20
@@ -55,9 +55,9 @@ class Grid:
         
         # Probability parameters
         params['tree_burn_prob'] = 1 # base burn probability
-        params['prob_delta_tree1'] = 0 # probability delta for trees of type 1
+        params['prob_delta_tree1'] = -0.3 # probability delta for trees of type 1
         params['prob_delta_tree2'] = 0.4 # p. d. for trees of type 2
-        params['prob_delta_dens1'] = 0 # p. d. for density type 1
+        params['prob_delta_dens1'] = -0.3 # p. d. for density type 1
         params['prob_delta_dens2'] = 0 # p. d. for density type 2
         params['prob_delta_dens3'] = 0.3 #p. d. for density type 3
         
