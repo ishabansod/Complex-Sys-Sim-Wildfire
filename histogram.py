@@ -1,6 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
+import openpyxl
+import powerlaw
 
 def import_xlsx_file(file_path, column_number, parameter):
     df = pd.read_excel(file_path, sheet_name=parameter)
@@ -8,13 +10,14 @@ def import_xlsx_file(file_path, column_number, parameter):
     return desired_column
 
 def plot_loghist(data, bins):
-    frequency, bins, _ = plt.hist(data, bins = bins, log=True)
+    frequency, bins = np.histogram(data, bins=bins)
+    #frequency, bins, _ = plt.hist(data, bins = bins, log=True)
     fire_size = (bins[:-1] + bins[1:]) / 2
-    plt.xscale('log')
-    plt.title("Distribution of final fire size for fixed density/vegetation/elevation/wind vector")
-    plt.ylabel("Frequency")
-    plt.xlabel("Final fire size $N_F$")
-    plt.show()
+    #plt.xscale('log')
+    #plt.title("Distribution of final fire size for fixed density/vegetation/elevation/wind vector")
+    #plt.ylabel("Frequency")
+    #plt.xlabel("Final fire size $N_F$")
+    #plt.show()
     return frequency, fire_size
 
 def log_linear_regression(x, y, min_x):
@@ -54,26 +57,20 @@ def linearity_test(file_path, column_number, parameter):
     plt.ylabel('Log frequency')
     plt.xlabel("Log final fire size $N_F$")
     plt.show()
-    return slope, r_squared
+    return slope, r_squared, log_fire_size
 
-file_path = 'C:\\Users\\cyril\\OneDrive\\Documenten\\GitHub\\Complex-Sys-Sim-Wildfire\\Fire_data_n100.xlsx'
-parameter_list = ['prob_delta_tree1', 'prob_delta_dens1', 'wind_speed']
+file_path = 'C:\\Users\\cyril\\OneDrive\\Documenten\\GitHub\\Complex-Sys-Sim-Wildfire\\Fire_data_n500.xlsx'
+parameter_list = ['percentage_tree_1', 'prob_delta_dens1']
 R_squared_matrix = []
+slope_matrix = []
 
-for parameter in parameter_list:
-    R_squared_list = []
-    slope_list = []
+slope, r_squared, log_fire_size = linearity_test(file_path, 8, parameter_list[0])
 
-    for element in range(0, 1):
-        slope, r_squared = linearity_test(file_path, element, parameter)
-        slope_list.append(slope)
-        R_squared_list.append(r_squared)
-
-    # Save data to list
-    excel_file = 'C:\\Users\\cyril\\OneDrive\\Documenten\\GitHub\\Complex-Sys-Sim-Wildfire\\LinReg_data.xlsx'
-    df = pd.DataFrame({'Slope': slope_list, 'R_squared': R_squared_list})
-    with pd.ExcelWriter(excel_file, mode='a', engine='openpyxl') as writer:
-        df.to_excel(writer, sheet_name=parameter, index=False)
-    
-    R_squared_list.clear()
-    slope_list.clear()
+burned = import_xlsx_file(file_path, 0, parameter_list[0])
+data = burned
+fit = powerlaw.Fit(data=data, discrete=True)
+print(fit.distribution_compare('power_law', 'lognormal'))
+print(fit.distribution_compare('power_law', 'exponential'))
+print(fit.distribution_compare('power_law', 'lognormal_positive'))
+print(fit.distribution_compare('power_law', 'stretched_exponential'))
+print(fit.distribution_compare('power_law', 'truncated_power_law'))
