@@ -8,9 +8,18 @@ class WildFireSimulation(Grid):
         super().__init__(rows,cols,init_params)
         
         self.history = [] # stores a list of forest states
-        self.history.append(np.copy(self.current_forest))
         self.converged = False
         self.lit_tree = False
+        
+    def start_fire(self):
+        ''' start fire at a random point '''
+        start_fire_x = random.randint(0, self.cols - 1)
+        start_fire_y = random.randint(0, self.rows - 1)
+        for row in range(start_fire_y - 1, start_fire_y + 2):
+            for col in range(start_fire_x - 1, start_fire_x + 2):
+                if 0 <= row < self.rows and 0 <= col < self.cols:
+                    self.current_forest[row][col] = 3
+        self.history.append(np.copy(self.current_forest))
 
     def update_grid(self):
         '''use the current grid and use the transition rules, returns updated grid'''
@@ -96,6 +105,7 @@ class WildFireSimulation(Grid):
     def run(self,steps=-1):
         '''updates the grid for number of steps'''
         step = 0
+        self.start_fire()
         while steps==-1 or step < steps:
             self.update_grid()
             if self.converged:

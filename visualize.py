@@ -10,7 +10,7 @@ import pandas as pd
 import openpyxl
 import matplotlib.pyplot as plt
 import numpy as np
-import powerlaw
+#import powerlaw
 
 class Visualize():
     def __init__(self, filepath):
@@ -38,6 +38,7 @@ class Visualize():
     def animate(self,sim, steps):
         animations = []
         fig = plt.figure()
+        sim.start_fire()
         for _ in range(steps):
             # update_grid()
             new_grid = copy.deepcopy(sim.update_grid())
