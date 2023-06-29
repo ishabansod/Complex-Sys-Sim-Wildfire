@@ -3,6 +3,7 @@ import random
 import numpy as np
 
 class WildFireSimulation(Grid):
+    '''class simulating the forest fire'''
     def __init__(self, rows, cols,init_params=True):
         super().__init__(rows,cols,init_params)
         
@@ -12,6 +13,8 @@ class WildFireSimulation(Grid):
         self.lit_tree = False
 
     def update_grid(self):
+        '''use the current grid and use the transition rules, returns updated grid'''
+
         # take current grid as input
         # if the cell is in state 1 (empty) or state 4 (burnt)
         # then the cell will remain in the same state
@@ -27,7 +30,7 @@ class WildFireSimulation(Grid):
         return self.current_forest
     
     def tree_state(self,row,col):
-        
+        '''finds the state of a tree'''
         # edges do not change
         if row == 0 or col == 0 or row == self.rows-1 or col == self.cols-1:
             return 1
@@ -48,6 +51,7 @@ class WildFireSimulation(Grid):
             tree_state = self.burn_trees(row, col, neighbors)
             if tree_state == 3:
                 self.lit_tree = True
+                self.burned_trees += 1
             return tree_state
         
         return tree_state
@@ -83,13 +87,14 @@ class WildFireSimulation(Grid):
         return [d,0]
     
     def get_burnt(self,steps=-1): 
-        # print("percentage_tree_1----", self.params['percentage_tree_1'])
+        '''counts the nuumber of burned trees in the grid'''
         self.run(steps)
         burned = self.burned_trees
         self.reset()
         return burned
 
     def run(self,steps=-1):
+        '''updates the grid for number of steps'''
         step = 0
         while steps==-1 or step < steps:
             self.update_grid()
@@ -98,4 +103,5 @@ class WildFireSimulation(Grid):
             step += 1
     
     def reset(self):
+        '''set the grid to default'''
         self.__init__(self.rows,self.cols,init_params=False)

@@ -8,11 +8,12 @@ import pandas as pd
 import time
 
 class MakePlots:
-
+    '''class to make plots with changing parameters'''
     def __init__(self, simulation):
         self.simulation = simulation
 
     def sensitivity_analysis(self, sim, parameter, values, n_simulations):
+        '''find burned trees for paramter values in given range'''
         results = []
         start_time = time.time()
         for i in range(0, len(values)):
@@ -48,13 +49,14 @@ class MakePlots:
         plt.figure()
         plt.fill_between(values, lower_ci, upper_ci, alpha=0.3, label='95% Confidence interval')
         plt.plot(values, means, 'o-', label=parameter)
-        plt.errorbar(values, means, yerr=[means - lower_ci, upper_ci - means], marker='o', linestyle='', label=parameter)
+        # plt.errorbar(values, means, yerr=[means - lower_ci, upper_ci - means], marker='o', linestyle='', label=parameter)
         plt.xlabel(parameter)
-        plt.ylabel('Average Number of Burned Trees')
+        plt.ylabel('Burned Trees')
+        plt.grid()
         plt.legend()
 
         # Saving in 'plots' folder
-        filename = f'{parameter}_sensitivity.png'
+        filename = f'{parameter}_sensitivity_00.png'
         filepath = os.path.join('plots', filename)
         plt.savefig(filepath)
         plt.show()

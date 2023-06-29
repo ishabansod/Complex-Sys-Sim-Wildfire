@@ -3,8 +3,8 @@ import random
 import math
 
 class Grid:
+    '''Grid Class - has functions for parameters and probability calculations'''
     def __init__(self, rows, cols, init_params=True):
-        
         self.rows = rows
         self.cols = cols
         self.burned_trees = 0
@@ -12,7 +12,7 @@ class Grid:
         
         # intialize parameters
         if init_params==True:
-            self.params = self.init_params( )
+            self.params = self.init_params()
         
         # auxiliary information grids
         self.trees = self.init_trees()
@@ -26,6 +26,7 @@ class Grid:
     ## PARAMETERS ##
     
     def init_params(self):
+        '''sets default parameters for the grid'''
         params = {}
 
         # Vegetation parameters
@@ -35,13 +36,13 @@ class Grid:
 
         # Wind parameters
         params['wind_enabled'] = True
-        params['wind_speed'] = 10
+        params['wind_speed'] = 5
         params['wind_angle'] = 180
         params['wind_c1'] = 0.045
         params['wind_c2'] = 0.131
         
         # Density parameters
-        params['grid_density'] = 0.4
+        params['grid_density'] = 0.9
         params['density_enabled'] = True
 
         # Altitude parameters
@@ -53,8 +54,8 @@ class Grid:
         params['peak_slope'] = 0.1
         params['alpha'] = 0.078 
         
-        # Probability parameters
-        params['tree_burn_prob'] = 1 # base burn probability
+        # Probability parameters - from the ref paper
+        params['tree_burn_prob'] = 0.58 # base burn probability
         params['prob_delta_tree1'] = -0.3 # probability delta for trees of type 1
         params['prob_delta_tree2'] = 0.4 # p. d. for trees of type 2
         params['prob_delta_dens1'] = -0.3 # p. d. for density type 1
@@ -64,14 +65,15 @@ class Grid:
         return params
     
     def set_params(self, key, value):
+        '''used to change default parameters'''
         self.params[key] = value
         return
 
     ## MAIN GRID FOR SIMULATIONS ##
     
     def init_grid(self):
-        # states: 1- empty; 2- tree; 3- burning; 4- burnt
-        # forest = [[2 for _ in range(self.cols)] for _ in range(self.rows)]
+        '''initializes the grid with default/set density'''
+
         grid_density = self.params['grid_density']
         edge = lambda row,col : row == 0 or col == 0 or row == self.rows-1 or col == self.cols-1
         forest = np.array([[1 if random.random() > grid_density or edge(row,col) else 2 for col in range(self.cols)] for row in range(self.rows)])
@@ -88,6 +90,8 @@ class Grid:
         return forest
     
     def burn_trees(self, x, y, neighbors):
+        '''calculates the probability that a neighboring tree burns and burns it'''
+
         # probability of burning
         p = self.params['tree_burn_prob']
 
@@ -123,6 +127,8 @@ class Grid:
     ## AUXILIARY INFORMATION GRIDS ##
     
     def init_trees(self):
+        '''sets the vegetation type of trees in the grid'''
+        
         rand = self.params['rand']
         
         # two types - 1: agricultural areas and 2: pine trees
@@ -181,6 +187,8 @@ class Grid:
         return tree_matrix
     
     def init_wind(self):
+        '''sets the wind in the grid'''
+
         # simplified burn probability depending on wind
         # Set initial conditions
         
@@ -200,6 +208,8 @@ class Grid:
         return p_w
 
     def init_density(self):
+        '''sets the density of trees'''
+
         # three types - 1: sparse, 2: normal and 3: dense
         density_matrix = [[0 for _ in range(self.cols)] for _ in range(self.rows)]
     
@@ -220,6 +230,8 @@ class Grid:
         return density_matrix
     
     def init_altitude(self):
+        '''sets the overall elevation of the grid'''
+
         alt_matrix = [[0 for _ in range(self.cols)] for _ in range(self.rows)]
 
         max_height = self.params['peak_height']
@@ -258,7 +270,6 @@ class Grid:
         row_offset = abs(x - neighbor_row)
         col_offset = abs(y - neighbor_col)
         return row_offset != 0 and col_offset != 0
-
 
     def calc_slope(self, neighbor, cell, is_diagonal):
         #TODO decide constants

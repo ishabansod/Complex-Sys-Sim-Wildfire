@@ -1,4 +1,5 @@
 from simulate import WildFireSimulation
+from make_plots import MakePlots
 from visualize import Visualize
 import os
 import matplotlib.pyplot as plt
@@ -19,13 +20,13 @@ if __name__=="__main__":
         os.makedirs('data')
     
     # # INITIALIZE SIMULATION:
-    # rows = 100
-    # cols = 100
-    # n_simulations=2
+    rows = 100
+    cols = 100
+    n_simulations = 100
     
     # datapoints = 20
     
-    # sim = WildFireSimulation(rows, cols)
+    sim = WildFireSimulation(rows, cols)
     
     # d = np.linspace(0.1,1,datapoints)
     # c = np.zeros((datapoints,n_simulations))
@@ -37,5 +38,13 @@ if __name__=="__main__":
     #     print(i)
     # plt.scatter(d,c.mean(axis=1))
 
+    # plotter = MakePlots(sim)
+    # parameters = ['percentage_tree_1', 'wind_speed']
+    # values = [[0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
+    #          [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20]]
+    # for i, parameter in enumerate(parameters):
+    #     # print(parameter, "-----", values[i])
+    #     plotter.sensitivity_analysis(sim, parameter, values[i], n_simulations)
+
     visualizer = Visualize('Fire_data_n100.xlsx')
-    visualizer.scaling_behavior()
+    visualizer.animate(sim, steps=200)
