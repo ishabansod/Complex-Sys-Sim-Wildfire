@@ -1,18 +1,18 @@
 import matplotlib.pyplot as plt
-from simulate import WildFireSimulation
 import os
 import numpy as np
 import scipy.stats as stats
-import openpyxl
-import pandas as pd
 import time
+from scipy.optimize import curve_fit
+from tqdm import tqdm
+
 
 class MakePlots:
     '''class to make plots with changing parameters'''
     def __init__(self, simulation):
         self.simulation = simulation
 
-    def sensitivity_analysis(self, sim, parameter, values, n_simulations):
+    def sensitivity_analysis(self, parameter, values, n_simulations):
         '''find burned trees for paramter values in given range'''
         results = []
         start_time = time.time()
@@ -20,8 +20,8 @@ class MakePlots:
             value = values[i]
             burned = []
             for _ in range(n_simulations):
-                sim.set_params(parameter, value)
-                burned.append(sim.get_burnt())
+                self.simulation.set_params(parameter, value)
+                burned.append(self.simulation.get_burnt())
             
             # print("burned----", burned)
             mean = np.mean(burned)
@@ -64,3 +64,45 @@ class MakePlots:
         end_time = time.time()
         elapsed_time = end_time - start_time
         print(f"Computation time: {elapsed_time} seconds")
+        
+    def clustering_analysis(self):
+        '''find burned trees for different degrees of clustering'''
+        sim = self.simulation
+        rows = sim.rows
+        cols = sim.cols
+        
+        sim.make_deterministic() # turn off probabilities
+        datapoints = 50 # how many densities to sweep
+        density_param = np.linspace(0.35,0.6,datapoints)
+        clustering = [0,0.5,1,1.5,2] # how much clustering to perform
+        
+        
+        for i,c in enumerate(clustering): # for each degree of clustering
+            
+            points = []
+            print('Clustering {} out of {}'.format(i,len(clustering)-1))
+            
+            for d in tqdm(density_param):
+                
+                sim.set_params('grid_density', d)
+                                                
+                sim.reset() # we reinitialize the forest to set the density
+                
+                sim.apply_voters_model(c) # we use the voters model to apply clustering 
+                
+                density = sim.total_trees/rows/cols
+                if density < 0.35:
+                    continue #we are not interested if the density gets too low due to clustering
+                
+                morans_i = sim.morans_i() # we quantify the clustering
+                sim.run()
+                percentage_burnt = sim.burned_trees/sim.total_trees
+                
+                points.append([density,morans_i,percentage_burnt])
+                np.save('points{}'.format(i),points) # save points to analyze interactively (jupyter notebook)
+                
+        
+        
+    def sigmoid(self, x, x0, k):
+        y = 1 / (1 + np.exp(-k*(x-x0)))
+        return y
