@@ -89,6 +89,25 @@ class Grid:
 
         return forest
     
+    def morans_i(self):
+        '''calculates Moran's I for the self.current_forest'''
+        r = self.rows
+        c = self.cols
+        N = r*c
+        
+        W = np.zeros((N,N),dtype='int')
+        for d in [1,-1,c,-c,c+1,c-1,-c+1,-c-1]:
+            W += np.eye(N,k=d,dtype='int')
+        Wn = 2*(N-1) + 2*(N-c) + 2*(N-c-1) + 2*(N-c+1)
+
+        x = self.current_forest.flatten()
+        mean = x.mean()
+        x0 = x - mean
+        var = np.dot(x0,x0)
+
+        I = np.transpose(x0)@W@x0*N/Wn/var
+        return I
+    
     def burn_trees(self, x, y, neighbors):
         '''calculates the probability that a neighboring tree burns and burns it'''
 
