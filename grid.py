@@ -7,7 +7,6 @@ class Grid:
     def __init__(self, rows, cols, init_params=True):
         self.rows = rows
         self.cols = cols
-        self.burned_trees = 0
         self.total_trees = 0
         
         # intialize parameters
@@ -42,7 +41,7 @@ class Grid:
         params['wind_c2'] = 0.131
         
         # Density parameters
-        params['grid_density'] = 0.9
+        params['grid_density'] = 0.7
         params['density_enabled'] = True
 
         # Altitude parameters
@@ -68,6 +67,12 @@ class Grid:
         '''used to change default parameters'''
         self.params[key] = value
         return
+    
+    def make_deterministic(self):
+        self.params['tree_burn_prob'] = 1
+        paramlist = ['species_enabled','wind_enabled','density_enabled','peak_enabled','prob_delta_tree1','prob_delta_dens1']
+        for key in paramlist:
+            self.params[key] = 0
 
     ## MAIN GRID FOR SIMULATIONS ##
     
@@ -78,16 +83,48 @@ class Grid:
         edge = lambda row,col : row == 0 or col == 0 or row == self.rows-1 or col == self.cols-1
         forest = np.array([[1 if random.random() > grid_density or edge(row,col) else 2 for col in range(self.cols)] for row in range(self.rows)])
         self.total_trees = np.count_nonzero(forest==2)
-        start_fire_x = random.randint(0, self.cols - 1)
-        start_fire_y = random.randint(0, self.rows - 1)
-
-        # forest[start_fire_x][start_fire_y] = 3  # start fire at a random point
-        for row in range(start_fire_y - 1, start_fire_y + 2):
-            for col in range(start_fire_x - 1, start_fire_x + 2):
-                if 0 <= row < self.rows and 0 <= col < self.cols:
-                    forest[row][col] = 3  # start fire at a random point
 
         return forest
+    
+    def morans_i(self):
+        '''calculates Moran's I for the self.current_forest'''
+        r = self.rows-2
+        c = self.cols-2
+        N = r*c
+        
+        W = np.zeros((N,N),dtype='int')
+        for d in [1,-1,c,-c,c+1,c-1,-c+1,-c-1]:
+            W += np.eye(N,k=d,dtype='int')
+        Wn = 2*(N-1) + 2*(N-c) + 2*(N-c-1) + 2*(N-c+1)
+
+        x = self.current_forest[1:self.rows-1,1:self.cols-1].flatten()
+        mean = x.mean()
+        x0 = x - mean
+        var = np.dot(x0,x0)
+
+        I = np.transpose(x0)@W@x0*N/Wn/var
+        return I
+    
+    def apply_voters_model(self,iterations):
+        forest = self.current_forest.copy()
+
+        for _ in range(int(iterations*self.rows*self.cols)):
+            i = np.random.randint(1,high=self.rows-1)
+            j = np.random.randint(1,high=self.cols-1)
+            neighbors = []
+            for dx in [-1, 0, 1]:
+                for dy in [-1, 0, 1]:
+                    if dx == 0 and dy == 0:
+                        continue
+                    if 0 < i + dx < self.rows-1 and 0 < j + dy < self.cols-1:
+                        neighbors.append(forest[i + dx, j + dy])
+
+            majority_opinion = np.median(neighbors)
+            forest[i, j] = majority_opinion
+
+        self.current_forest = forest.copy()
+        self.total_trees = np.count_nonzero(forest==2)
+        return
     
     def burn_trees(self, x, y, neighbors):
         '''calculates the probability that a neighboring tree burns and burns it'''
