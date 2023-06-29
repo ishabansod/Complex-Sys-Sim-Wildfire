@@ -7,7 +7,6 @@ class Grid:
     def __init__(self, rows, cols, init_params=True):
         self.rows = rows
         self.cols = cols
-        self.burned_trees = 0
         self.total_trees = 0
         
         # intialize parameters
@@ -42,7 +41,7 @@ class Grid:
         params['wind_c2'] = 0.131
         
         # Density parameters
-        params['grid_density'] = 0.5
+        params['grid_density'] = 0.7
         params['density_enabled'] = True
 
         # Altitude parameters
@@ -68,6 +67,12 @@ class Grid:
         '''used to change default parameters'''
         self.params[key] = value
         return
+    
+    def make_deterministic(self):
+        self.params['tree_burn_prob'] = 1
+        paramlist = ['species_enabled','wind_enabled','density_enabled','peak_enabled','prob_delta_tree1','prob_delta_dens1']
+        for key in paramlist:
+            self.params[key] = 0
 
     ## MAIN GRID FOR SIMULATIONS ##
     
@@ -101,24 +106,24 @@ class Grid:
         return I
     
     def apply_voters_model(self,iterations):
-        forest = np.ones((self.rows,self.cols))
+        forest = self.current_forest.copy()
 
-        for _ in range(iterations):
-            for i in range(1,self.rows-1):
-                for j in range(1,self.cols-1):
-                    neighbors = []
-                    for dx in [-1, 0, 1]:
-                        for dy in [-1, 0, 1]:
-                            if dx == 0 and dy == 0:
-                                continue
-                            if 0 < i + dx < self.rows-1 and 0 < j + dy < self.cols-1:
-                                neighbors.append(self.current_forest[i + dx, j + dy])
+        for _ in range(int(iterations*self.rows*self.cols)):
+            i = np.random.randint(1,high=self.rows-1)
+            j = np.random.randint(1,high=self.cols-1)
+            neighbors = []
+            for dx in [-1, 0, 1]:
+                for dy in [-1, 0, 1]:
+                    if dx == 0 and dy == 0:
+                        continue
+                    if 0 < i + dx < self.rows-1 and 0 < j + dy < self.cols-1:
+                        neighbors.append(forest[i + dx, j + dy])
 
-                    majority_opinion = np.median(neighbors)
-                    forest[i, j] = majority_opinion
+            majority_opinion = np.median(neighbors)
+            forest[i, j] = majority_opinion
 
-            self.current_forest = forest.copy()
-    
+        self.current_forest = forest.copy()
+        self.total_trees = np.count_nonzero(forest==2)
         return
     
     def burn_trees(self, x, y, neighbors):

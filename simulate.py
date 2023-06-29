@@ -7,9 +7,11 @@ class WildFireSimulation(Grid):
     def __init__(self, rows, cols,init_params=True):
         super().__init__(rows,cols,init_params)
         
+        self.burned_trees = 0
         self.history = [] # stores a list of forest states
         self.converged = False
         self.lit_tree = False
+        self.duration = 0.9
         
     def start_fire(self):
         ''' start fire at a random point '''
@@ -48,7 +50,7 @@ class WildFireSimulation(Grid):
         tree_state = state[row][col]
         
         if tree_state == 3:
-            if random.random() < 0.5:
+            if random.random() < self.duration:
                 self.lit_tree = True
                 return 3
             else:
@@ -60,7 +62,6 @@ class WildFireSimulation(Grid):
             tree_state = self.burn_trees(row, col, neighbors)
             if tree_state == 3:
                 self.lit_tree = True
-                self.burned_trees += 1
             return tree_state
         
         return tree_state
