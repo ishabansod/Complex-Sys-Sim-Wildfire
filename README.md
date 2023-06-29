@@ -3,7 +3,7 @@
 ## About
 Simulating forest fires using 2D cellular automata to understand the dynamics, scaling laws, critical exponents and transitions.
 
-This project is a (partial) implementation of the paper - [A cellular automata model for forest fire spread prediction]("https://www.sciencedirect.com/science/article/pii/S0096300308004943)
+This project is a (partial) implementation of the paper - [A cellular automata model for forest fire spread prediction](https://www.sciencedirect.com/science/article/pii/S0096300308004943)
 
 ![](https://github.com/ishabansod/Complex-Sys-Sim-Wildfire/blob/model/plots/gif-tree-type-dens-0.9.gif)
 
@@ -53,7 +53,7 @@ visualizer.scaling_behavior()
 
 
 ### References
-1. [A cellular automata model for forest fire spread prediction]("https://www.sciencedirect.com/science/article/pii/S0096300308004943)
+1. [A cellular automata model for forest fire spread prediction](https://www.sciencedirect.com/science/article/pii/S0096300308004943)
 2. [Forest fire spread using cellular automata](https://www.sciencedirect.com/science/article/abs/pii/S0965997806001293 )
 3. [Parallel CellularAutomaton Wildfire](https://github.com/XC-Li/Parallel_CellularAutomaton_Wildfire/tree/master)
 4. [Introduction of self-organised critical forest fire model](https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.69.1629)

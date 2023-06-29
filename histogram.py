@@ -59,7 +59,7 @@ def linearity_test(file_path, column_number, parameter):
     plt.show()
     return slope, r_squared, log_fire_size
 
-file_path = 'C:\\Users\\cyril\\OneDrive\\Documenten\\GitHub\\Complex-Sys-Sim-Wildfire\\Fire_data_n500.xlsx'
+file_path = 'data\\Fire_data_n500.xlsx'
 parameter_list = ['percentage_tree_1', 'prob_delta_dens1']
 R_squared_matrix = []
 slope_matrix = []
