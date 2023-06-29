@@ -42,7 +42,7 @@ class Grid:
         params['wind_c2'] = 0.131
         
         # Density parameters
-        params['grid_density'] = 0.9
+        params['grid_density'] = 0.5
         params['density_enabled'] = True
 
         # Altitude parameters
@@ -99,6 +99,27 @@ class Grid:
 
         I = np.transpose(x0)@W@x0*N/Wn/var
         return I
+    
+    def apply_voters_model(self,iterations):
+        forest = np.ones((self.rows,self.cols))
+
+        for _ in range(iterations):
+            for i in range(1,self.rows-1):
+                for j in range(1,self.cols-1):
+                    neighbors = []
+                    for dx in [-1, 0, 1]:
+                        for dy in [-1, 0, 1]:
+                            if dx == 0 and dy == 0:
+                                continue
+                            if 0 < i + dx < self.rows-1 and 0 < j + dy < self.cols-1:
+                                neighbors.append(self.current_forest[i + dx, j + dy])
+
+                    majority_opinion = np.median(neighbors)
+                    forest[i, j] = majority_opinion
+
+            self.current_forest = forest.copy()
+    
+        return
     
     def burn_trees(self, x, y, neighbors):
         '''calculates the probability that a neighboring tree burns and burns it'''
