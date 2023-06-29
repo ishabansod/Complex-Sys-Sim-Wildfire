@@ -86,10 +86,7 @@ class Visualize():
     def scaling_behavior(self):
         # Define the file path and sheet names
         file_path = self.filepath
-        sheet_names = ['percentage_tree_1', 'prob_delta_dens1', 'wind_speed'] # Replace with the actual sheet names
-
-        # Define a dictionary to store the best scores for each column
-        best_scores = {}
+        sheet_names = ['percentage_tree_1', 'prob_delta_dens1', 'wind_speed'] 
 
         # Loop over each sheet
         for sheet_name in sheet_names:
@@ -111,9 +108,35 @@ class Visualize():
                 fit = powerlaw.Fit(data=data, discrete=True)
 
                 print(f"Sheet: {sheet_name}, Column: {chr(ord('A') + column_index)}")
-                print(fit.distribution_compare('power_law', 'lognormal'))
-                print(fit.distribution_compare('power_law', 'exponential'))
-                print(fit.distribution_compare('power_law', 'lognormal_positive'))
-                print(fit.distribution_compare('power_law', 'stretched_exponential'))
-                print(fit.distribution_compare('power_law', 'truncated_power_law'))
+                print(fit.distribution_compare('truncated_power_law', 'lognormal'))
+                print(fit.distribution_compare('truncated_power_law', 'exponential'))
+                print(fit.distribution_compare('truncated_power_law', 'lognormal_positive'))
+                print(fit.distribution_compare('truncated_power_law', 'stretched_exponential'))
+                print(fit.distribution_compare('truncated_power_law', 'power_law'))
                 print('-' * 30)
+
+    def plot_truncated_power_law(self, sheet_name, column):
+        # Define the file path and sheet name
+        file_path = self.file_path
+
+        # Read the sheet into a pandas DataFrame
+        df = pd.read_excel(file_path, sheet_name=sheet_name)
+
+        # Get the values from the second column (column index)
+        data = df.iloc[:, column].dropna().values
+
+        # Fit a truncated power law to the data
+        fit = powerlaw.Fit(data, discrete=True, xmin=1)
+
+        # Plot the histogram
+        plt.hist(data, bins='auto', alpha=0.7, rwidth=0.85, color='blue', density=True, label='Data')
+
+        # Plot the fitted truncated power law
+        fit.truncated_power_law.plot_pdf(color='red', linestyle='--', label='Truncated Power Law Fit')
+
+        plt.xlabel('Amount burned treees')
+        plt.ylabel('Amount of occurences')
+        plt.title('Histogram with Truncated Power Law Fit')
+        plt.legend()
+        plt.grid(axis='y', alpha=0.5)
+        plt.show()
