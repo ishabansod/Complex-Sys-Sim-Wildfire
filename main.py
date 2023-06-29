@@ -24,10 +24,25 @@ if __name__=="__main__":
     cols = 100
     n_simulations = 100
     
-    # datapoints = 20
-    
     sim = WildFireSimulation(rows, cols)
+
+    # ---- uncomment following block of code to see effect of varying parameters -----
+    plotter = MakePlots(sim)
+    parameters = ['percentage_tree_1', 'wind_speed', 'alpha']
+    values = [[0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
+             [0, 2, 4, 6, 8, 10],
+             [0.05, 0.06, 0.07, 0.08, 0.09]]
+    for i, parameter in enumerate(parameters):
+        print(parameter, "-----", values[i])
+        plotter.sensitivity_analysis(sim, parameter, values[i], n_simulations)
+    # --------------------------------------------------------------------------------
+
+    # ---- uncomment following block of code to see animation of simulation ----------
+    # visualizer = Visualize('Fire_data_n100.xlsx')
+    # visualizer.animate(sim, steps=200)
+    # --------------------------------------------------------------------------------
     
+    # datapoints = 20
     # d = np.linspace(0.1,1,datapoints)
     # c = np.zeros((datapoints,n_simulations))
     
@@ -37,14 +52,3 @@ if __name__=="__main__":
     #     c[i] = counts
     #     print(i)
     # plt.scatter(d,c.mean(axis=1))
-
-    # plotter = MakePlots(sim)
-    # parameters = ['percentage_tree_1', 'wind_speed']
-    # values = [[0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
-    #          [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20]]
-    # for i, parameter in enumerate(parameters):
-    #     # print(parameter, "-----", values[i])
-    #     plotter.sensitivity_analysis(sim, parameter, values[i], n_simulations)
-
-    visualizer = Visualize('Fire_data_n100.xlsx')
-    visualizer.animate(sim, steps=200)
