@@ -83,8 +83,8 @@ class Grid:
     
     def morans_i(self):
         '''calculates Moran's I for the self.current_forest'''
-        r = self.rows
-        c = self.cols
+        r = self.rows-2
+        c = self.cols-2
         N = r*c
         
         W = np.zeros((N,N),dtype='int')
@@ -92,7 +92,7 @@ class Grid:
             W += np.eye(N,k=d,dtype='int')
         Wn = 2*(N-1) + 2*(N-c) + 2*(N-c-1) + 2*(N-c+1)
 
-        x = self.current_forest.flatten()
+        x = self.current_forest[1:self.rows-1,1:self.cols-1].flatten()
         mean = x.mean()
         x0 = x - mean
         var = np.dot(x0,x0)
