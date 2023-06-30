@@ -51,6 +51,15 @@ visualizer = Visualize('Fire_data_n100.xlsx') # change file-name here
 visualizer.scaling_behavior()
 ```
 
+4. To see the effect of clustering
+    - run the clustering_analysis method of the MakePlotter class
+    - parameters of the sweep are editable inside of make_plots.py
+    - data analysis is done in clustering_plots.ipynb notebook
+
+```
+plotter = MakePlots(sim)
+plotter.clustering_analysis()
+```
 
 ### References
 1. [A cellular automata model for forest fire spread prediction](https://www.sciencedirect.com/science/article/pii/S0096300308004943)
