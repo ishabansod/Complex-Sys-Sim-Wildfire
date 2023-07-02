@@ -5,7 +5,7 @@ Simulating forest fires using 2D cellular automata to understand the dynamics, s
 
 This project is a (partial) implementation of the paper - [A cellular automata model for forest fire spread prediction](https://www.sciencedirect.com/science/article/pii/S0096300308004943)
 
-![](https://github.com/ishabansod/Complex-Sys-Sim-Wildfire/blob/model/plots/gif-tree-type-dens-0.9.gif)
+![](https://github.com/ishabansod/Complex-Sys-Sim-Wildfire/blob/main/plots/gif-tree-type-dens-0.9.gif)
 
 ## Requirements
 Please install the following packages before running the code
